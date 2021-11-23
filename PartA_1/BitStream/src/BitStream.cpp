@@ -32,7 +32,12 @@ bool bitStream::bufferIsFull() {
     return bufferCount == 8;
 }
 
-bool bitStream::readBit(unsigned char &res) {   
+bool bitStream::readBit(unsigned char &res) {
+    if(!isOpen) {
+        std::cout << "ERROR: File is closed" << std::endl;
+        return false;
+    }
+
     if(mode != bs_mode::read) {
         std::cout << "ERROR: Can read from output file" << std::endl;
         return false;
@@ -55,6 +60,11 @@ bool bitStream::readBit(unsigned char &res) {
 }
 
 bool bitStream::writeBit(const unsigned char bit) {
+    if(!isOpen) {
+        std::cout << "ERROR: File is closed" << std::endl;
+        return false;
+    }
+
     if(mode != bs_mode::write) {
         std::cout << "ERROR: Can write from input file" << std::endl;
         return false;
@@ -76,19 +86,30 @@ bool bitStream::writeBit(const unsigned char bit) {
     return true; 
 } 
 
-void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
+bool bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
+    if(!isOpen) {
+        std::cout << "ERROR: File is closed" << std::endl;
+        return false;
+    }
+
+    if(mode != bs_mode::read) {
+        std::cout << "ERROR: Can read from output file" << std::endl;
+        return false;
+    }
+
+
     int bitsToRead = nBits;
     
     //No bits to read
     if(nBits == 0)
-        return;
+        return true;
 
     //All bits are in buffer
     if(bufferCount >= bitsToRead) {
         bits[0] = buffer && (std::pow(2, bitsToRead) - 1);
         buffer = buffer >> bitsToRead;
         bufferCount -= bitsToRead;
-        return;
+        return true; 
     }
 
     //Read all bits from buffer
@@ -99,7 +120,7 @@ void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
     //At this point buffer is empty, fill it
     fileStream.read(&buffer, 1);
     if(handleReadError())
-        return;
+        return false;
     
     //If we are reading less then a byte or a byte
     if(nBits <= BS_BUFFER_SIZE) {
@@ -107,7 +128,7 @@ void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
         buffer = buffer >> bitsToRead;
         bufferCount = BS_BUFFER_SIZE - bitsToRead;
 
-        return;
+        return true;
     }
 
     //if we are reading more then a byte
@@ -125,13 +146,13 @@ void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
         if(i != bytesRemaining - 1) {
             fileStream.read(&buffer,1);
             if(handleReadError())
-                return;
+                return false;
         }
     }
 
     if(bitsRemaining == 0){
         bufferCount = 0;
-        return;
+        return true;
     }
 
     //fill array with bits remaining
@@ -139,7 +160,7 @@ void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
     //read to buffer
     fileStream.read(&buffer,1);
     if(handleReadError())
-        return;
+        return false;
 
     //if bits remaning is less or equal the space left in last byte of filled array
     if(bitsRemaining <= BS_BUFFER_SIZE - arrayOffset) {
@@ -154,11 +175,11 @@ void bitStream::readNBits(unsigned char *bits, const unsigned int nBits) {
     buffer = buffer >> bitsRemaining;
     bufferCount = BS_BUFFER_SIZE - bitsRemaining;
 
-    return;
+    return true;
 }
 
-void bitStream::writeNBits(const unsigned char *bit, const unsigned int nBits) {
-    
+bool bitStream::writeNBits(const unsigned char *bit, const unsigned int nBits) {
+    return true;
 }
 
 bool bitStream::open(std::string file, bs_mode mode) {

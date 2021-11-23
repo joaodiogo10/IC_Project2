@@ -28,8 +28,8 @@ class bitStream {
         ~bitStream();
         bool readBit(unsigned char &res);
         bool writeBit(const unsigned char bit);
-        void readNBits(unsigned char *bits, const unsigned int nBits);
-        void writeNBits(const unsigned char *bits, const unsigned int nBits);
+        bool readNBits(unsigned char *bits, const unsigned int nBits);
+        bool writeNBits(const unsigned char *bits, const unsigned int nBits);
         bool open(std::string file, bs_mode mode);
         bool close();
 };
