@@ -29,39 +29,45 @@ int main(int argc, char *argv[]) {
 
     bitStream iStream("test.txt", bs_mode::read);
     unsigned char input = 0;
-    iStream.readBit(input);
-    
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
+    unsigned char tmp = 0;
+
+    iStream.readBit(tmp);
+    input = input | (tmp << 7);
+    iStream.readBit(tmp);
+    input = input | (tmp << 6);
+    iStream.readBit(tmp);
+    input = input | (tmp << 5);
+    iStream.readBit(tmp);
+    input = input | (tmp << 4);
+    iStream.readBit(tmp);
+    input = input | (tmp << 3);
+    iStream.readBit(tmp);
+    input = input | (tmp << 2);
+    iStream.readBit(tmp);
+    input = input | (tmp << 1);
+    iStream.readBit(tmp);
+    input = input | tmp;
+
     std::cout << input;
 
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
-    input = input >> 1;
-    iStream.readBit(input);
+    input = 0;
+    iStream.readBit(tmp);
+    input = input | (tmp << 7);
+    iStream.readBit(tmp);
+    input = input | (tmp << 6);
+    iStream.readBit(tmp);
+    input = input | (tmp << 5);
+    iStream.readBit(tmp);
+    input = input | (tmp << 4);
+    iStream.readBit(tmp);
+    input = input | (tmp << 3);
+    iStream.readBit(tmp);
+    input = input | (tmp << 2);
+    iStream.readBit(tmp);
+    input = input | (tmp << 1);
+    iStream.readBit(tmp);
+    input = input | tmp;
+
 
     std::cout << input << std::endl;
     iStream.close();

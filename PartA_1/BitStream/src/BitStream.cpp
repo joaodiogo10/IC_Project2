@@ -7,7 +7,7 @@ bitStream::bitStream(const std::string file, bs_mode mode) {
     else
         fileStream.open(file, std::ios_base::out | std::ios_base::binary);
 
-    if(!fileStream.is_open()) {
+    if(handleOpenError()) {
         isOpen = false;
         std::cerr << "ERROR: Failed to open file" << std::endl;
         return;
@@ -32,7 +32,7 @@ bool bitStream::bufferIsFull() {
     return bufferCount == 8;
 }
 
-bool bitStream::readBit(unsigned char &res) {
+bool bitStream::readBit(unsigned char &res) {   
     if(mode != bs_mode::read) {
         std::cout << "ERROR: Can read from output file" << std::endl;
         return false;
@@ -47,8 +47,8 @@ bool bitStream::readBit(unsigned char &res) {
         bufferCount = 8;
     }  
 
-    res = res | ( (buffer & 0x01) << 7 );
-    buffer = buffer >> 1;
+    res = (buffer & 128) >> 7;
+    buffer = buffer << 1;
     bufferCount--;
 
     return true;
