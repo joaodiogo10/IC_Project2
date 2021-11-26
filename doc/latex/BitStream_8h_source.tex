@@ -1,0 +1,47 @@
+\hypertarget{BitStream_8h_source}{}\doxysection{Bit\+Stream.\+h}
+\label{BitStream_8h_source}\index{/home/joao/Desktop/IC/IC\_Project2/PartA\_1/BitStream/include/BitStream.h@{/home/joao/Desktop/IC/IC\_Project2/PartA\_1/BitStream/include/BitStream.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{2 }
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <fstream>}}
+\DoxyCodeLine{5 }
+\DoxyCodeLine{6 \textcolor{comment}{//Buffer size in bits}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#define BS\_BUFFER\_SIZE 8}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{13 \textcolor{keyword}{class }\mbox{\hyperlink{classbitStream}{bitStream}} \{}
+\DoxyCodeLine{14     \textcolor{keyword}{public}:}
+\DoxyCodeLine{18         \textcolor{keyword}{enum} \mbox{\hyperlink{classbitStream_ae311de4fc076314c55c877d10772248d}{bs\_mode}}\{read, write\}; }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{25         \mbox{\hyperlink{classbitStream_a2cb5819ad699770842eba31bfdb8bfda}{bitStream}}(\textcolor{keyword}{const} std::string file, \mbox{\hyperlink{classbitStream_ae311de4fc076314c55c877d10772248d}{bitStream::bs\_mode}} mode);}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{33         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_af3ce1ba3276cd883701537f48e17a754}{readBit}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} \&res);}
+\DoxyCodeLine{34         }
+\DoxyCodeLine{39         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_afd78ca28640d4fd5962870fc2b1c7a82}{writeBit}}(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} bit);}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{46         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_a74cdc51d6a8a002a3c4b42073da736d7}{readNBits}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *bits, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBits);}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{53         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_a59853807467e31c0bfebe51ee34c84b3}{writeNBits}}(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *bits, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBits);}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{61         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_a963e0f45051ccf9cf843390ba6d38d28}{open}}(std::string filePath, \mbox{\hyperlink{classbitStream_ae311de4fc076314c55c877d10772248d}{bitStream::bs\_mode}} mode);}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{67         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classbitStream_a9e6436ab58c5534bf25572b2da2550b5}{close}}();}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     \textcolor{keyword}{private}:}
+\DoxyCodeLine{70         std::fstream fileStream;}
+\DoxyCodeLine{71         \mbox{\hyperlink{classbitStream_ae311de4fc076314c55c877d10772248d}{bs\_mode}} mode;}
+\DoxyCodeLine{72         \textcolor{keywordtype}{char} buffer;}
+\DoxyCodeLine{73         \textcolor{keywordtype}{int} bufferCount;}
+\DoxyCodeLine{74         \textcolor{keywordtype}{bool} isOpen;}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76         \mbox{\hyperlink{classbitStream}{\string~bitStream}}();}
+\DoxyCodeLine{77         \textcolor{keywordtype}{bool} bufferIsEmpty();}
+\DoxyCodeLine{78         \textcolor{keywordtype}{bool} bufferIsFull();}
+\DoxyCodeLine{79         \textcolor{keywordtype}{bool} handleReadError();}
+\DoxyCodeLine{80         \textcolor{keywordtype}{bool} handleWriteError();}
+\DoxyCodeLine{81         \textcolor{keywordtype}{bool} handleOpenError();}
+\DoxyCodeLine{82         \textcolor{keywordtype}{bool} handleCloseError();    }
+\DoxyCodeLine{83 \};}
+
+\end{DoxyCode}
