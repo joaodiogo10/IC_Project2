@@ -21,18 +21,19 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
     this->mode = mode;
 }
 
+//Talvez despejar o resto do buffer na escrita?
 BitStream::~BitStream()
 {
     if (mode == BitStream::bs_mode::write && bufferCount != 0)
         std::cerr << "WARNING: Some bits might not have been written" << std::endl;
 }
 
-bool BitStream::bufferIsEmpty()
+const bool BitStream::bufferIsEmpty()
 {
     return bufferCount == 0;
 }
 
-bool BitStream::bufferIsFull()
+const bool BitStream::bufferIsFull()
 {
     return bufferCount == 8;
 }
@@ -122,7 +123,7 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
     //All bits are in buffer
     if (bufferCount >= bitsToRead)
     {
-        bits[0] = buffer & bit_mask_to_read(bitsToRead);
+        bits[0] = (buffer & bit_mask_to_read(bitsToRead)) >> (BUFFER_SIZE - bitsToRead);
         buffer = buffer << bitsToRead;
         bufferCount -= bitsToRead;
         return true;
@@ -144,6 +145,9 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
     if (nBits <= BUFFER_SIZE)
     {
         bits[0] = bits[0] | ((buffer & bit_mask_to_read(bitsToRead)) >> arrayOffset);
+        //align do the left
+        u_char emptyBits = BUFFER_SIZE - nBits;
+        bits[0] = bits[0] >> emptyBits;
         buffer = buffer << bitsToRead;
         bufferCount = BUFFER_SIZE - bitsToRead;
 
@@ -176,6 +180,9 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
 
     if (bitsRemaining == 0)
     {
+        //align last array byte do the left
+        u_char emptyBits = BUFFER_SIZE - arrayOffset;
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits;  
         bufferCount = 0;
         return true;
     }
@@ -188,10 +195,14 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
         return false;
 
     //if bits remaning is less or equal the space left in last byte of filled array
-    if (bitsRemaining <= BUFFER_SIZE - arrayOffset)
+    if (bitsRemaining <= (BUFFER_SIZE - arrayOffset))
     {
         bits[bytesRemaining] = bits[bytesRemaining] | ((buffer & bit_mask_to_read(bitsRemaining)) >> arrayOffset);
         buffer = buffer << bitsRemaining;
+
+        //align last array byte do the left
+        u_char emptyBits = BUFFER_SIZE - (arrayOffset + bitsRemaining);
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits; 
     }
     //else we will need another byte in array
     else
@@ -203,6 +214,10 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
         tmp = bitsRemaining - (BUFFER_SIZE - arrayOffset);
         bits[bytesRemaining + 1] = buffer & bit_mask_to_read(tmp);
         buffer = buffer << tmp;
+
+        //align last array byte do the left
+        u_char emptyBits = tmp;
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits; 
     }
 
     bufferCount = BUFFER_SIZE - bitsRemaining;
@@ -221,7 +236,6 @@ bool BitStream::writeNBits(const unsigned char *bits, const unsigned int nBits)
     int bytesToRead = ceil(double(nBits) / 8);
     int bitsRemaining = nBits % 8;
     unsigned char auxBuffer, bit;
-    std::cout << "bytesToRead" << bytesToRead << std::endl;
 
     //For multiples of 8
     if (bitsRemaining == 0)
@@ -309,7 +323,7 @@ bool BitStream::close()
     return true;
 }
 
-bool BitStream::handleReadError()
+const bool BitStream::handleReadError()
 {
     if (fileStream.eof())
     {
@@ -326,7 +340,7 @@ bool BitStream::handleReadError()
     return false;
 }
 
-bool BitStream::handleWriteError()
+const bool BitStream::handleWriteError()
 {
     if (fileStream.fail())
     {
@@ -337,7 +351,7 @@ bool BitStream::handleWriteError()
     return false;
 }
 
-bool BitStream::handleOpenError()
+const bool BitStream::handleOpenError()
 {
     if (!fileStream.is_open())
     {
@@ -348,7 +362,7 @@ bool BitStream::handleOpenError()
     return false;
 }
 
-bool BitStream::handleCloseError()
+const bool BitStream::handleCloseError()
 {
     if (fileStream.is_open())
     {

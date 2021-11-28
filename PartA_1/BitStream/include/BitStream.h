@@ -82,10 +82,10 @@ class BitStream {
         int bufferCount;
         bool isOpen;
 
-        bool bufferIsEmpty();
-        bool bufferIsFull();
-        bool handleReadError();
-        bool handleWriteError();
-        bool handleOpenError();
-        bool handleCloseError();    
+        const bool bufferIsEmpty();
+        const bool bufferIsFull();
+        const bool handleReadError();
+        const bool handleWriteError();
+        const bool handleOpenError();
+        const bool handleCloseError();    
 };
