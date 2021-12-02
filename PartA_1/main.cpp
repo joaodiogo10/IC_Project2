@@ -182,6 +182,10 @@ void testWriteNBits() {
     // 0001
     // 0001 1001
     
+    // 1110 1111 1111
+    // char[0] = 1110 1111
+    // char[1] = 1111
+
     //0001 0100
     unsigned char number = 20;
 

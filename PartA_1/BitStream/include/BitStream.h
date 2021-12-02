@@ -15,6 +15,7 @@ class BitStream {
         */
         enum bs_mode{read, write}; 
 
+        
         /**
          * @brief Construct a new BitStream object.
          * @param file Path to the target file.
@@ -71,6 +72,8 @@ class BitStream {
          * 
          */
         bool close();
+
+        bool isClosed();
 
     private:
         #define bit_mask_to_read(nBits) ( (unsigned char) (std::pow(2, nBits) - 1) << (BUFFER_SIZE - nBits) )
