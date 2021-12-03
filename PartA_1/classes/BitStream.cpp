@@ -9,11 +9,11 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
         fileStream.open(file, std::ios_base::out | std::ios_base::binary);
 
     if (handleOpenError()) {
-        isOpen = false;
+        fOpen = false;
         return;
     }
 
-    isOpen = true;
+    fOpen = true;
     this->buffer = 0;
     this->bufferCount = 0;
     this->mode = mode;
@@ -21,7 +21,7 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
 
 BitStream::~BitStream()
 {
-    if(isOpen && mode == bs_mode::write)
+    if(fOpen && mode == bs_mode::write)
         flushBuffer();
 }
 
@@ -254,14 +254,15 @@ bool BitStream::writeNBits(const unsigned char *bits, const unsigned int nBits)
     return true;
 }
 
-bool BitStream::flushBuffer() {
+bool BitStream::flushBuffer(uint8_t bit) {
     if (!validWriteOperation())
         return false;
 
     if(bufferCount == 0)
         return false;
     
-    char tmp = buffer << (BUFFER_SIZE - bufferCount);
+    uint8_t shiftAmount = (BUFFER_SIZE - bufferCount);
+    char tmp = buffer << shiftAmount | ((uint8_t) std::pow(2,shiftAmount) * (bit & 0x01) - 1);
     
     fileStream.write(&tmp, 1);
     if (handleWriteError())
@@ -270,10 +271,15 @@ bool BitStream::flushBuffer() {
     buffer = 0;
     bufferCount = 0;
     return true;
+
+}
+
+bool BitStream::flushBuffer() {
+    return flushBuffer(0);
 }
 
 const bool BitStream::validReadOperation() {
-    if (!isOpen)
+    if (!fOpen)
     {
         std::cout << "ERROR: File is closed" << std::endl;
         return false;
@@ -288,7 +294,7 @@ const bool BitStream::validReadOperation() {
 }
 
 const bool BitStream::validWriteOperation() {
-    if (!isOpen)
+    if (!fOpen)
     {
         std::cout << "ERROR: File is closed" << std::endl;
         return false;
@@ -303,7 +309,7 @@ const bool BitStream::validWriteOperation() {
 }
 
 bool BitStream::open(std::string file, BitStream::bs_mode mode) {
-    if (isOpen)
+    if (fOpen)
     {
         std::cerr << "ERROR: File is already opened!" << std::endl;
         return false;
@@ -317,7 +323,7 @@ bool BitStream::open(std::string file, BitStream::bs_mode mode) {
     if (handleOpenError())
         return false;
 
-    isOpen = true;
+    fOpen = true;
     this->buffer = 0;
     this->bufferCount = 0;
     this->mode = mode;
@@ -325,7 +331,7 @@ bool BitStream::open(std::string file, BitStream::bs_mode mode) {
 }
 
 bool BitStream::close() {
-    if (!isOpen)
+    if (!fOpen)
     {
         std::cerr << "ERROR: File is already closed!" << std::endl;
         return false;
@@ -338,12 +344,12 @@ bool BitStream::close() {
     if (handleCloseError())
         return false;
 
-    isOpen = false;
+    fOpen = false;
     return true;
 }
 
-const bool BitStream::streamIsOpen() {
-    return isOpen;
+const bool BitStream::isOpen() {
+    return fOpen;
 }
 
 const bool BitStream::handleReadError()

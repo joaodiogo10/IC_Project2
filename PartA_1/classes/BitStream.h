@@ -66,6 +66,8 @@ class BitStream {
          * \sa BitStream::bs_mode.
          */
         
+        bool flushBuffer(uint8_t bit);
+        
         bool flushBuffer();
         
         bool open(std::string filePath, BitStream::bs_mode mode);
@@ -77,7 +79,7 @@ class BitStream {
 
         bool close();
 
-        const bool streamIsOpen();
+        const bool isOpen();
 
     private:
         #define bit_mask_to_read(nBits) ( (unsigned char) (std::pow(2, nBits) - 1) << (BUFFER_SIZE - nBits) )
@@ -87,7 +89,7 @@ class BitStream {
         bs_mode mode;
         char buffer;
         int bufferCount;
-        bool isOpen;
+        bool fOpen;
 
         const bool bufferIsEmpty();
         const bool bufferIsFull();

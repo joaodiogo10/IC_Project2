@@ -7,7 +7,12 @@ class Golomb {
         void setM(uint32_t m);
         void encodeNumber(const int number);
         int32_t decodeNumber();
-
+        bool fillWithPadding(uint8_t bit);
+        bool fillWithPadding();
+        
+        bool close();
+        bool open(std::string filePath, BitStream::bs_mode mode);
+        bool isOpen();
     private:
         uint32_t m;
         BitStream stream;
