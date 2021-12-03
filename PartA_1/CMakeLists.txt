@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.16.3)
-project(testBitStream)
-add_subdirectory(BitStream)
+project(PartA_1)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(testBitStream testBitStream.cpp classes/BitStream.cpp)
+target_include_directories(testBitStream PRIVATE classes)
+target_link_directories(testBitStream PRIVATE classes)
 
-target_include_directories(${PROJECT_NAME} PRIVATE BitStream/include)
-target_link_libraries(${PROJECT_NAME} BitStream)
+add_executable(testGolomb testGolomb.cpp classes/BitStream.cpp classes/Golomb.cpp)
+target_include_directories(testGolomb PRIVATE classes)
+target_link_directories(testGolomb PRIVATE classes)
