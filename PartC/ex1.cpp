@@ -36,17 +36,9 @@ int main(int argc, char *argv[])
     int halfRows = srcImage.rows / 2;
     int halfCols = srcImage.cols / 2;
 
-    //isto aqui dá malloc(), corrupted top size se usar CV_8UC1 ??
-    cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_64FC1);
-    cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_64FC1);
-
-    // cout << "UComponent = " << endl
-    //      << " ola" << UComponentReduced << endl
-    //      << endl;
-
-    // cout << "UComponent = " << endl
-    //      << " ola" << UComponentReduced.size << endl
-    //      << endl;
+    //isto aqui dá malloc(), corrupted top size se usar CV_8UC1 para algumas imagens??
+    cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
+    cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
 
     convertToYUV(srcImage, YComponent, UComponent, VComponent);
     convertTo420(YComponent, UComponent, VComponent, UComponentReduced, VComponentReduced);
@@ -122,6 +114,7 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
             //atribuo as posiçoes na nova matriz
             pUReduced[countColums] = pU[j];
             pVReduced[countColums] = pV[j];
+
             //somar + 1 pra saltos de 2 em 2
             j++;
             //somar + 1 pra nova posiçao nas novas matrizes
