@@ -9,6 +9,7 @@ using namespace cv;
 
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
+void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 int main(int argc, char *argv[])
 {
@@ -52,6 +53,13 @@ int main(int argc, char *argv[])
 
     convertToYUV(srcImage, YComponent, UComponent, VComponent);
     convertTo420(YComponent, UComponent, VComponent, UComponentReduced, VComponentReduced);
+
+    //Matrices for predictor values
+    cv::Mat YPredictor = cv::Mat::zeros(srcImage.rows, srcImage.cols, CV_32SC1);
+    cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+
+    predictor_1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
 
     imwrite("Y.jpeg", YComponent);
     imwrite("U.jpeg", UComponent);
@@ -118,6 +126,48 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
         {
             pUReduced[countColums] = pU[j];
             pVReduced[countColums] = pV[j];
+        }
+    }
+}
+
+void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
+    uchar *pY, *pU, *pV, previous, secondPrevious;
+    short *pYNew, *pUNew, *pVNew, r;
+    previous = 0;
+
+    //Predictor for Y
+    for (int i = 0; i < YComponent.rows; i++)
+    {
+        pY = YComponent.ptr<uchar>(i);
+        pYNew = YPredictor.ptr<short>(i);
+        for (int j = 0; j < YComponent.cols; j++)
+        {
+            r = pY[j] - previous;
+            previous = pY[j];
+            pYNew[j] = r;
+        }
+    }
+
+    previous = 0;
+    secondPrevious = 0;
+
+    //Predictor for U and V
+    for (int i = 0; i < UComponentReduced.rows; i++)
+    {
+        pU = UComponentReduced.ptr<uchar>(i);
+        pUNew = UReducedPredictor.ptr<short>(i);
+        pV = VComponentReduced.ptr<uchar>(i);
+        pVNew = VReducedPredictor.ptr<short>(i);
+        for (int j = 0; j < UComponentReduced.cols; j++)
+        {
+            r = pU[j] - previous;
+            previous = pU[j];
+            pUNew[j] = r;
+
+            r = pV[j] - secondPrevious;
+            secondPrevious = pV[j];
+            pVNew[j] = r;
         }
     }
 }
