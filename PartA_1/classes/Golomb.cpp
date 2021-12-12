@@ -35,16 +35,12 @@ void Golomb::encodeNumber(const int32_t number) {
     //m is multiple of 2
     if(nBitsMax == nBitsMin) {
         uint8_t bitPos = nBitsMax;
-        std::cout << "BitPos: " << (uint32_t) bitPos << std::endl;
-        uint8_t bytes = std::ceil( nBitsMax / (double) 8);
 
         do {
             bitPos--;
             int32_t mask = std::pow(2, bitPos);
             int8_t bit = (r & mask) >> bitPos;
-            std::cout << "Bit: " << (uint32_t) bit << std::endl;
             stream.writeBit(bit);
-            std::cout << "BitPos: " << (uint32_t) bitPos << std::endl;
         }while(bitPos != 0);
         
         return;
@@ -57,14 +53,12 @@ void Golomb::encodeNumber(const int32_t number) {
     if(r < threshold)
     {
         nBits = nBitsMax;
-        std::cout << "Below threshold " << threshold << std::endl;
     }
     else
     {
         nBits = nBitsMin;
         //shift remainder
         r = r >> 1;
-        std::cout << "Above threshold " << threshold << std::endl;
     }
     uint8_t bitPos = nBits; 
     do {
@@ -96,7 +90,6 @@ int32_t Golomb::decodeNumber() {
 
     //-----read r-----
     uint8_t nBitsMin = std::floor(log2(m));
-    uint8_t nBitsMax = std::ceil(log2(m));
     
     uint8_t readBits = 0;
     while(readBits < nBitsMin) {
@@ -133,14 +126,6 @@ int32_t Golomb::unfoldNumber(const uint32_t number) {
     else
         return - ((number + 1) / 2);
 }
-
-bool Golomb::fillWithPadding(uint8_t bit) {
-    return stream.flushBuffer(bit);
-} 
-
-bool Golomb::fillWithPadding() {
-    return stream.flushBuffer(0);
-}   
 
 bool Golomb::close() {
     return stream.close();   

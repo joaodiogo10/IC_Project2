@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['readbit_0',['readBit',['../classBitStream.html#ad91637cbf130f09641313f0d5a073cc4',1,'BitStream']]],
-  ['readnbits_1',['readNBits',['../classBitStream.html#af43140ea5f5bffcdf1ed9993d42e4304',1,'BitStream']]]
+  ['open_0',['open',['../classBitStream.html#a9dffcb0f5e8be6d7b3da75205998f69e',1,'BitStream::open()'],['../classGolomb.html#af63e3c63c9c2fe529aedb1402091899e',1,'Golomb::open()']]]
 ];

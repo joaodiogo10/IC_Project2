@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parta_5f1_0',['PartA_1',['../md__home_joao_Desktop_IC_IC_Project2_PartA_1_README.html',1,'']]]
+  ['isopen_0',['isOpen',['../classBitStream.html#a77b90253c1273f7362245690988eb474',1,'BitStream::isOpen()'],['../classGolomb.html#aa10dc14ca81845baaa51967fcf12cf2f',1,'Golomb::isOpen()']]]
 ];

@@ -171,8 +171,8 @@ void testReadNBits() {
     std::cout << "18: ";
     std::cout << (u_int)input2[0] << std::endl;
 
-    //Read 12 bits result should be input2[0] = 0010 0110 (32 decimal)
-    std::cout << "32: ";
+    //Read 12 bits result should be input2[0] = 0010 0110 (38 decimal)
+    std::cout << "38: ";
     iStream.readNBits(input2, 12);
     std::cout << (u_int)input2[0] << std::endl;
 

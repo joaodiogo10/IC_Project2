@@ -22,7 +22,9 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
 BitStream::~BitStream()
 {
     if(fOpen && mode == bs_mode::write)
+    {
         flushBuffer();
+    }
 }
 
 const bool BitStream::bufferIsEmpty()
@@ -259,10 +261,13 @@ bool BitStream::flushBuffer(uint8_t bit) {
         return false;
 
     if(bufferCount == 0)
-        return false;
+        return true;
     
     uint8_t shiftAmount = (BUFFER_SIZE - bufferCount);
-    char tmp = buffer << shiftAmount | ((uint8_t) std::pow(2,shiftAmount) * (bit & 0x01) - 1);
+
+    char tmp = buffer << shiftAmount;
+    if((bit & 0x01) == 1)
+        tmp = tmp | ((uint8_t) std::pow(2,shiftAmount) * (bit & 0x01) - 1);
     
     fileStream.write(&tmp, 1);
     if (handleWriteError())
@@ -271,7 +276,6 @@ bool BitStream::flushBuffer(uint8_t bit) {
     buffer = 0;
     bufferCount = 0;
     return true;
-
 }
 
 bool BitStream::flushBuffer() {

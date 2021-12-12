@@ -59,14 +59,10 @@ int main(int argc, char *argv[])
     // stream:   0000 0110 . 1000 0100 . 1011 1010 . 0
     encoder.encodeNumber(2);
 
-    //file result: 0000 0110 . 1000 0100 . 1011 1010 . 0111 1111 (06 84 BA 7F)    
-    encoder.fillWithPadding(1);
-    
-
+    //file result: 0000 0110 . 1000 0100 . 1011 1010 . 0000 0000(06 84 BA 00)    
     encoder.close();
 
     std::cout << "-------Test decoder-------" << std::endl;
-    std::cout << "Writing numbers: 20, -15, -7, 2" << std::endl;
 
     Golomb decoder(testFile, BitStream::bs_mode::read, 7);
     int32_t number;
@@ -82,7 +78,7 @@ int main(int argc, char *argv[])
     
     decoder.setM(4);
     number = decoder.decodeNumber();
-    std::cout << "Decoded number: " << number << std::endl;
+    std::cout << "Decoded number: " << number << std::endl; 
     
     return 0;
 }

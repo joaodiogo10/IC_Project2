@@ -3,14 +3,12 @@
 #include <iostream>
 #include <fstream>
 
-//Buffer size in bits
 /** 
  * \brief Class to read and write bits from a file. 
  * 
  * All errors are handled by this class, simply printing to standard output an error or warning massage.
  * Methods that can cause an error to occur return false when it occurs.
 */
-
 class BitStream {
     public:
         /** 
@@ -108,7 +106,7 @@ class BitStream {
          * Bits written 10111111.
          *  
          * \return True, if no errors occurred.
-         * \return False, if errors occurred or buffer is empty.
+         * \return False, if errors occurred.
          */
         bool flushBuffer(uint8_t bit);
         
@@ -118,7 +116,7 @@ class BitStream {
          * Simply calls \ref flushBuffer(0)
          *  
          * \return True, if no errors occurred.
-         * \return False, if errors occurred or buffer is empty.
+         * \return False, if errors occurred.
          */
         bool flushBuffer();
        
