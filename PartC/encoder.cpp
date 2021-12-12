@@ -196,7 +196,6 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     uchar *pY, *pU, *pV, previous, secondPrevious;
     short *pYPred, *pUPred, *pVPred, r;
     previous = 0;
-    int count = 0;
 
     //Predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
@@ -204,9 +203,8 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 
         pY = YComponent.ptr<uchar>(i);
         pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YComponent.cols; j++, count++)
+        for (int j = 0; j < YComponent.cols; j++)
         {
-
             r = pY[j] - previous;
             previous = pY[j];
             pYPred[j] = r;
