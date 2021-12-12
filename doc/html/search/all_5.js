@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['open_0',['open',['../classBitStream.html#a9dffcb0f5e8be6d7b3da75205998f69e',1,'BitStream']]]
+  ['golomb_0',['Golomb',['../classGolomb.html',1,'Golomb'],['../classGolomb.html#aefe31962540b3e88b1b53f75a9d3ab02',1,'Golomb::Golomb()']]]
 ];

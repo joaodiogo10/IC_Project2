@@ -134,14 +134,6 @@ int32_t Golomb::unfoldNumber(const uint32_t number) {
         return - ((number + 1) / 2);
 }
 
-bool Golomb::fillWithPadding(uint8_t bit) {
-    return stream.flushBuffer(bit);
-} 
-
-bool Golomb::fillWithPadding() {
-    return stream.flushBuffer(0);
-}   
-
 bool Golomb::close() {
     return stream.close();   
 }

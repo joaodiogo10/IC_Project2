@@ -259,7 +259,7 @@ bool BitStream::flushBuffer(uint8_t bit) {
         return false;
 
     if(bufferCount == 0)
-        return false;
+        return true;
     
     uint8_t shiftAmount = (BUFFER_SIZE - bufferCount);
     char tmp = buffer << shiftAmount | ((uint8_t) std::pow(2,shiftAmount) * (bit & 0x01) - 1);

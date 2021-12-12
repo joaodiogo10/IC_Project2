@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['isopen_0',['isOpen',['../classBitStream.html#a77b90253c1273f7362245690988eb474',1,'BitStream']]]
+  ['encodenumber_0',['encodeNumber',['../classGolomb.html#abc09b37ea79b7157dd64e956a47f1545',1,'Golomb']]]
 ];

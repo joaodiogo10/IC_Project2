@@ -68,37 +68,249 @@ $(function() {
   <div class="headertitle"><div class="title">Golomb Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Class that codes, to a file, or encodes, from a file, golomb codes.  
+ <a href="classGolomb.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Golomb_8h_source.html">Golomb.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aefe31962540b3e88b1b53f75a9d3ab02"><td class="memItemLeft" align="right" valign="top"><a id="aefe31962540b3e88b1b53f75a9d3ab02" name="aefe31962540b3e88b1b53f75a9d3ab02"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Golomb</b> (const std::string filePath, const <a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a> mode, uint32_t m)</td></tr>
+<tr class="memitem:aefe31962540b3e88b1b53f75a9d3ab02"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#aefe31962540b3e88b1b53f75a9d3ab02">Golomb</a> (const std::string filePath, const <a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a> mode, uint32_t m)</td></tr>
+<tr class="memdesc:aefe31962540b3e88b1b53f75a9d3ab02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classGolomb.html" title="Class that codes, to a file, or encodes, from a file, golomb codes.">Golomb</a> object.  <a href="classGolomb.html#aefe31962540b3e88b1b53f75a9d3ab02">More...</a><br /></td></tr>
 <tr class="separator:aefe31962540b3e88b1b53f75a9d3ab02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a623c980452c6eae7d8adfaefff71053b"><td class="memItemLeft" align="right" valign="top"><a id="a623c980452c6eae7d8adfaefff71053b" name="a623c980452c6eae7d8adfaefff71053b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setM</b> (uint32_t m)</td></tr>
+<tr class="memitem:a623c980452c6eae7d8adfaefff71053b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#a623c980452c6eae7d8adfaefff71053b">setM</a> (uint32_t m)</td></tr>
+<tr class="memdesc:a623c980452c6eae7d8adfaefff71053b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets M parameter of <a class="el" href="classGolomb.html" title="Class that codes, to a file, or encodes, from a file, golomb codes.">Golomb</a> code.  <a href="classGolomb.html#a623c980452c6eae7d8adfaefff71053b">More...</a><br /></td></tr>
 <tr class="separator:a623c980452c6eae7d8adfaefff71053b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc09b37ea79b7157dd64e956a47f1545"><td class="memItemLeft" align="right" valign="top"><a id="abc09b37ea79b7157dd64e956a47f1545" name="abc09b37ea79b7157dd64e956a47f1545"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>encodeNumber</b> (const int number)</td></tr>
+<tr class="memitem:abc09b37ea79b7157dd64e956a47f1545"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#abc09b37ea79b7157dd64e956a47f1545">encodeNumber</a> (const int number)</td></tr>
+<tr class="memdesc:abc09b37ea79b7157dd64e956a47f1545"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a number and write it to the <a class="el" href="classBitStream.html">BitStream</a>.  <a href="classGolomb.html#abc09b37ea79b7157dd64e956a47f1545">More...</a><br /></td></tr>
 <tr class="separator:abc09b37ea79b7157dd64e956a47f1545"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2080d354075fa28002292cf98cb0aa2"><td class="memItemLeft" align="right" valign="top"><a id="aa2080d354075fa28002292cf98cb0aa2" name="aa2080d354075fa28002292cf98cb0aa2"></a>
-int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>decodeNumber</b> ()</td></tr>
+<tr class="memitem:aa2080d354075fa28002292cf98cb0aa2"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#aa2080d354075fa28002292cf98cb0aa2">decodeNumber</a> ()</td></tr>
+<tr class="memdesc:aa2080d354075fa28002292cf98cb0aa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode a number from the <a class="el" href="classBitStream.html">BitStream</a>.  <a href="classGolomb.html#aa2080d354075fa28002292cf98cb0aa2">More...</a><br /></td></tr>
 <tr class="separator:aa2080d354075fa28002292cf98cb0aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d3f0457d4fb47c57890e712b3a44e3a"><td class="memItemLeft" align="right" valign="top"><a id="a7d3f0457d4fb47c57890e712b3a44e3a" name="a7d3f0457d4fb47c57890e712b3a44e3a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>fillWithPadding</b> (uint8_t bit)</td></tr>
-<tr class="separator:a7d3f0457d4fb47c57890e712b3a44e3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f58d05f5d7d06443cdb0e1831fcd599"><td class="memItemLeft" align="right" valign="top"><a id="a3f58d05f5d7d06443cdb0e1831fcd599" name="a3f58d05f5d7d06443cdb0e1831fcd599"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>fillWithPadding</b> ()</td></tr>
-<tr class="separator:a3f58d05f5d7d06443cdb0e1831fcd599"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a378fba018f427162ca6b48715f61ba99"><td class="memItemLeft" align="right" valign="top"><a id="a378fba018f427162ca6b48715f61ba99" name="a378fba018f427162ca6b48715f61ba99"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
+<tr class="memitem:a378fba018f427162ca6b48715f61ba99"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#a378fba018f427162ca6b48715f61ba99">close</a> ()</td></tr>
+<tr class="memdesc:a378fba018f427162ca6b48715f61ba99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close <a class="el" href="classBitStream.html">BitStream</a>.  <a href="classGolomb.html#a378fba018f427162ca6b48715f61ba99">More...</a><br /></td></tr>
 <tr class="separator:a378fba018f427162ca6b48715f61ba99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af63e3c63c9c2fe529aedb1402091899e"><td class="memItemLeft" align="right" valign="top"><a id="af63e3c63c9c2fe529aedb1402091899e" name="af63e3c63c9c2fe529aedb1402091899e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>open</b> (std::string filePath, <a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a> mode)</td></tr>
+<tr class="memitem:af63e3c63c9c2fe529aedb1402091899e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#af63e3c63c9c2fe529aedb1402091899e">open</a> (std::string filePath, <a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a> mode)</td></tr>
+<tr class="memdesc:af63e3c63c9c2fe529aedb1402091899e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open <a class="el" href="classBitStream.html">BitStream</a> to a target file.  <a href="classGolomb.html#af63e3c63c9c2fe529aedb1402091899e">More...</a><br /></td></tr>
 <tr class="separator:af63e3c63c9c2fe529aedb1402091899e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa10dc14ca81845baaa51967fcf12cf2f"><td class="memItemLeft" align="right" valign="top"><a id="aa10dc14ca81845baaa51967fcf12cf2f" name="aa10dc14ca81845baaa51967fcf12cf2f"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isOpen</b> ()</td></tr>
+<tr class="memitem:aa10dc14ca81845baaa51967fcf12cf2f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGolomb.html#aa10dc14ca81845baaa51967fcf12cf2f">isOpen</a> ()</td></tr>
+<tr class="memdesc:aa10dc14ca81845baaa51967fcf12cf2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify if <a class="el" href="classBitStream.html">BitStream</a> is open.  <a href="classGolomb.html#aa10dc14ca81845baaa51967fcf12cf2f">More...</a><br /></td></tr>
 <tr class="separator:aa10dc14ca81845baaa51967fcf12cf2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >Class that codes, to a file, or encodes, from a file, golomb codes. </p>
+<p >This class uses <a class="el" href="classBitStream.html">BitStream</a> in order to read bits from a file or write bits to a file. All errors are handled by <a class="el" href="classBitStream.html">BitStream</a> class. Methods from this class simply return false, propagating an error condition, in case an error occurs in a <a class="el" href="classBitStream.html">BitStream</a> operation. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classBitStream.html" title="Class to read and write bits from a file.">BitStream</a> </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aefe31962540b3e88b1b53f75a9d3ab02" name="aefe31962540b3e88b1b53f75a9d3ab02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefe31962540b3e88b1b53f75a9d3ab02">&#9670;&nbsp;</a></span>Golomb()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Golomb::Golomb </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>filePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>m</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classGolomb.html" title="Class that codes, to a file, or encodes, from a file, golomb codes.">Golomb</a> object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filePath</td><td>Path to the target file. </td></tr>
+    <tr><td class="paramname">mode</td><td></td></tr>
+    <tr><td class="paramname">m</td><td>M parameter of <a class="el" href="classGolomb.html" title="Class that codes, to a file, or encodes, from a file, golomb codes.">Golomb</a> code. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf" title="file mode">BitStream::bs_mode</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a378fba018f427162ca6b48715f61ba99" name="a378fba018f427162ca6b48715f61ba99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a378fba018f427162ca6b48715f61ba99">&#9670;&nbsp;</a></span>close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Golomb::close </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Close <a class="el" href="classBitStream.html">BitStream</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if no error occured. </dd>
+<dd>
+false, if an error occured. </dd></dl>
+
+</div>
+</div>
+<a id="aa2080d354075fa28002292cf98cb0aa2" name="aa2080d354075fa28002292cf98cb0aa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2080d354075fa28002292cf98cb0aa2">&#9670;&nbsp;</a></span>decodeNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int32_t Golomb::decodeNumber </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decode a number from the <a class="el" href="classBitStream.html">BitStream</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Decoded number. </dd></dl>
+
+</div>
+</div>
+<a id="abc09b37ea79b7157dd64e956a47f1545" name="abc09b37ea79b7157dd64e956a47f1545"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc09b37ea79b7157dd64e956a47f1545">&#9670;&nbsp;</a></span>encodeNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Golomb::encodeNumber </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>number</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Encode a number and write it to the <a class="el" href="classBitStream.html">BitStream</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa10dc14ca81845baaa51967fcf12cf2f" name="aa10dc14ca81845baaa51967fcf12cf2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa10dc14ca81845baaa51967fcf12cf2f">&#9670;&nbsp;</a></span>isOpen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Golomb::isOpen </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Verify if <a class="el" href="classBitStream.html">BitStream</a> is open. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if <a class="el" href="classBitStream.html">BitStream</a> is open. </dd>
+<dd>
+false, if <a class="el" href="classBitStream.html">BitStream</a> is closed. </dd></dl>
+
+</div>
+</div>
+<a id="af63e3c63c9c2fe529aedb1402091899e" name="af63e3c63c9c2fe529aedb1402091899e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af63e3c63c9c2fe529aedb1402091899e">&#9670;&nbsp;</a></span>open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Golomb::open </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>filePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf">BitStream::bs_mode</a>&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Open <a class="el" href="classBitStream.html">BitStream</a> to a target file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filePath</td><td>path to the target file </td></tr>
+    <tr><td class="paramname">mode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if no error occured. </dd>
+<dd>
+false, if an error occured.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf" title="file mode">BitStream::bs_mode</a> </dd></dl>
+
+</div>
+</div>
+<a id="a623c980452c6eae7d8adfaefff71053b" name="a623c980452c6eae7d8adfaefff71053b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a623c980452c6eae7d8adfaefff71053b">&#9670;&nbsp;</a></span>setM()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Golomb::setM </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets M parameter of <a class="el" href="classGolomb.html" title="Class that codes, to a file, or encodes, from a file, golomb codes.">Golomb</a> code. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/joao/Desktop/IC/IC_Project2/PartA_1/classes/<a class="el" href="Golomb_8h_source.html">Golomb.h</a></li>
 <li>/home/joao/Desktop/IC/IC_Project2/PartA_1/classes/Golomb.cpp</li>
