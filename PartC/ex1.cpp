@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <sstream>
+#include "../PartA_1/classes/Golomb.h"
 
 using namespace std;
 using namespace cv;
@@ -11,6 +12,7 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
+//./ex1 image textFile m
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -60,6 +62,52 @@ int main(int argc, char *argv[])
     cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
     predictor_1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
+
+    int m;
+    std::istringstream myStringM((string)argv[3]);
+    myStringM >> m;
+
+    Golomb encoder((string)argv[2], BitStream::bs_mode::write, m);
+
+    //encode m
+    encoder.encodeNumber(m);
+
+    //encode Y
+    uchar *pY;
+    for (int i = 0; i < YComponent.rows; i++)
+    {
+        pY = YComponent.ptr<uchar>(i);
+        for (int j = 0; j < YComponent.cols; j++)
+        {
+            encoder.encodeNumber(pY[j]);
+        }
+    }
+
+    //encode U
+    uchar *pU;
+    for (int i = 0; i < UReducedPredictor.rows; i++)
+    {
+        pU = UReducedPredictor.ptr<uchar>(i);
+        for (int j = 0; j < UReducedPredictor.cols; j++)
+        {
+            encoder.encodeNumber(pU[j]);
+        }
+    }
+
+    //encode V
+    uchar *pV;
+    for (int i = 0; i < VReducedPredictor.rows; i++)
+    {
+        pV = VReducedPredictor.ptr<uchar>(i);
+        for (int j = 0; j < VReducedPredictor.cols; j++)
+        {
+            encoder.encodeNumber(pV[j]);
+        }
+    }
+
+    //tenho de fzr fillWithPadding ???
+
+    encoder.close();
 
     imwrite("Y.jpeg", YComponent);
     imwrite("U.jpeg", UComponent);
