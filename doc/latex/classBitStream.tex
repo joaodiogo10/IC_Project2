@@ -1,0 +1,282 @@
+\hypertarget{classBitStream}{}\doxysection{Bit\+Stream Class Reference}
+\label{classBitStream}\index{BitStream@{BitStream}}
+
+
+Class to read and write bits from a file.  
+
+
+
+
+{\ttfamily \#include $<$Bit\+Stream.\+h$>$}
+
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}\label{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}} 
+enum \mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{bs\+\_\+mode}} \{ {\bfseries read}
+, {\bfseries write}
+ \}
+\begin{DoxyCompactList}\small\item\em file mode \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classBitStream_a9b8a7522a8747bb64c8a097e531c6ac5}{Bit\+Stream}} (const std\+::string file, \mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}} mode)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{classBitStream}{Bit\+Stream}} object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classBitStream_a63cf0f27c7519417a7984c476a32c9c9}{$\sim$\+Bit\+Stream}} ()
+\begin{DoxyCompactList}\small\item\em Destroy the \mbox{\hyperlink{classBitStream}{Bit\+Stream}} object. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_ad91637cbf130f09641313f0d5a073cc4}{read\+Bit}} (unsigned char \&res)
+\begin{DoxyCompactList}\small\item\em Read a bit from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_a25557aa577c21b3ac62165e483ea142b}{write\+Bit}} (const unsigned char bit)
+\begin{DoxyCompactList}\small\item\em Write a bit to \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_af43140ea5f5bffcdf1ed9993d42e4304}{read\+NBits}} (unsigned char $\ast$bits, const unsigned int n\+Bits)
+\begin{DoxyCompactList}\small\item\em Read N bits from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_a3539e97bdb943ac9f3a75c686168b8e6}{write\+NBits}} (const unsigned char $\ast$bits, const unsigned int n\+Bits)
+\begin{DoxyCompactList}\small\item\em Write N bits from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_a9dffcb0f5e8be6d7b3da75205998f69e}{open}} (std\+::string file\+Path, \mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}} mode)
+\begin{DoxyCompactList}\small\item\em Open \mbox{\hyperlink{classBitStream}{Bit\+Stream}} to the file. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_a7931e87c86a845d1d6243e70a98a84fe}{flush\+Buffer}} (uint8\+\_\+t bit)
+\begin{DoxyCompactList}\small\item\em Flush all bits in stream buffer to the stream. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_af1eb7c3ed1214008716b5233ec8d3be7}{flush\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Flush all bits in stream buffer to the stream. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classBitStream_ac3f0bf3c351bb2eb72ac5603f8b16e21}{close}} ()
+\begin{DoxyCompactList}\small\item\em Close \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\item 
+const bool \mbox{\hyperlink{classBitStream_a77b90253c1273f7362245690988eb474}{is\+Open}} ()
+\begin{DoxyCompactList}\small\item\em Open \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class to read and write bits from a file. 
+
+All errors are handled by this class, simply printing to standard output an error or warning massage. Methods that can cause an error to occur return false when it occurs. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classBitStream_a9b8a7522a8747bb64c8a097e531c6ac5}\label{classBitStream_a9b8a7522a8747bb64c8a097e531c6ac5}} 
+\index{BitStream@{BitStream}!BitStream@{BitStream}}
+\index{BitStream@{BitStream}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{BitStream()}{BitStream()}}
+{\footnotesize\ttfamily Bit\+Stream\+::\+Bit\+Stream (\begin{DoxyParamCaption}\item[{const std\+::string}]{file,  }\item[{\mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}}}]{mode }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{classBitStream}{Bit\+Stream}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & Path to the target file. \\
+\hline
+{\em mode} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}}. 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{classBitStream_a63cf0f27c7519417a7984c476a32c9c9}\label{classBitStream_a63cf0f27c7519417a7984c476a32c9c9}} 
+\index{BitStream@{BitStream}!````~BitStream@{$\sim$BitStream}}
+\index{````~BitStream@{$\sim$BitStream}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{$\sim$BitStream()}{~BitStream()}}
+{\footnotesize\ttfamily Bit\+Stream\+::$\sim$\+Bit\+Stream (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Destroy the \mbox{\hyperlink{classBitStream}{Bit\+Stream}} object. 
+
+If stream buffer isn\textquotesingle{}t empty, the remaining bits in the buffer are flushed to the stream. \begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classBitStream_a7931e87c86a845d1d6243e70a98a84fe}{flush\+Buffer}} 
+\end{DoxySeeAlso}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classBitStream_ac3f0bf3c351bb2eb72ac5603f8b16e21}\label{classBitStream_ac3f0bf3c351bb2eb72ac5603f8b16e21}} 
+\index{BitStream@{BitStream}!close@{close}}
+\index{close@{close}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Close \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+\begin{DoxyReturn}{Returns}
+True, if no errors occured 
+
+False, if errors occured 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_af1eb7c3ed1214008716b5233ec8d3be7}\label{classBitStream_af1eb7c3ed1214008716b5233ec8d3be7}} 
+\index{BitStream@{BitStream}!flushBuffer@{flushBuffer}}
+\index{flushBuffer@{flushBuffer}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{flushBuffer()}{flushBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::flush\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Flush all bits in stream buffer to the stream. 
+
+Simply calls flush\+Buffer(0)
+
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred or buffer is empty. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_a7931e87c86a845d1d6243e70a98a84fe}\label{classBitStream_a7931e87c86a845d1d6243e70a98a84fe}} 
+\index{BitStream@{BitStream}!flushBuffer@{flushBuffer}}
+\index{flushBuffer@{flushBuffer}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{flushBuffer()}{flushBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::flush\+Buffer (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{bit }\end{DoxyParamCaption})}
+
+
+
+Flush all bits in stream buffer to the stream. 
+
+if {\ttfamily bits} \& 0x01 == 0, 0\textquotesingle{}s are introduced as padding to write an entire byte. Otherwise, 1\textquotesingle{}s are introduced.
+
+Ex\+:~\newline
+{\ttfamily bit} = 0~\newline
+Bits in buffer 101111. ~\newline
+Bits written 10111100.
+
+{\ttfamily bit} = 1 ~\newline
+Bits in buffer 101111. ~\newline
+Bits written 10111111.
+
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred or buffer is empty. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_a77b90253c1273f7362245690988eb474}\label{classBitStream_a77b90253c1273f7362245690988eb474}} 
+\index{BitStream@{BitStream}!isOpen@{isOpen}}
+\index{isOpen@{isOpen}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{isOpen()}{isOpen()}}
+{\footnotesize\ttfamily const bool Bit\+Stream\+::is\+Open (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Open \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+\begin{DoxyReturn}{Returns}
+True, if stream is open 
+
+False, if stream is closed 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_a9dffcb0f5e8be6d7b3da75205998f69e}\label{classBitStream_a9dffcb0f5e8be6d7b3da75205998f69e}} 
+\index{BitStream@{BitStream}!open@{open}}
+\index{open@{open}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::open (\begin{DoxyParamCaption}\item[{std\+::string}]{file\+Path,  }\item[{\mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}}}]{mode }\end{DoxyParamCaption})}
+
+
+
+Open \mbox{\hyperlink{classBitStream}{Bit\+Stream}} to the file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Path} & Path to the target file. \\
+\hline
+{\em mode} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{Bit\+Stream\+::bs\+\_\+mode}}. 
+\end{DoxySeeAlso}
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_ad91637cbf130f09641313f0d5a073cc4}\label{classBitStream_ad91637cbf130f09641313f0d5a073cc4}} 
+\index{BitStream@{BitStream}!readBit@{readBit}}
+\index{readBit@{readBit}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{readBit()}{readBit()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::read\+Bit (\begin{DoxyParamCaption}\item[{unsigned char \&}]{res }\end{DoxyParamCaption})}
+
+
+
+Read a bit from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+Bit is writen in LSB, all remaining bits become 0.
+
+Ex\+: 0000 0001 (bit 1). 0000 0000 (bit 0). 
+\begin{DoxyParams}{Parameters}
+{\em res} & Reference where the read value is written to. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_af43140ea5f5bffcdf1ed9993d42e4304}\label{classBitStream_af43140ea5f5bffcdf1ed9993d42e4304}} 
+\index{BitStream@{BitStream}!readNBits@{readNBits}}
+\index{readNBits@{readNBits}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{readNBits()}{readNBits()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::read\+NBits (\begin{DoxyParamCaption}\item[{unsigned char $\ast$}]{bits,  }\item[{const unsigned int}]{n\+Bits }\end{DoxyParamCaption})}
+
+
+
+Read N bits from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+All bytes of the array are written in a little endian fashion. If {\ttfamily n\+Bits} \texorpdfstring{$<$}{<} 8, the reaminder bits are written to the first "{}{\ttfamily n\+Bits} \% 8"{} LSBs in little endian.
+
+Ex\+: ~\newline
+ Next bits of file stream = 1010 0000 1010 1111 ~\newline
+ n\+Bits = 12.
+
+Result\+: ~\newline
+{\ttfamily bits}\mbox{[}0\mbox{]} = 1010 0000 ~\newline
+{\ttfamily bits}\mbox{[}1\mbox{]} = 0000 1010 ~\newline
+
+\begin{DoxyParams}{Parameters}
+{\em bit} & Unsigned char array containing read bits. \\
+\hline
+{\em n\+Bits} & Number of bits to be read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classBitStream_a25557aa577c21b3ac62165e483ea142b}\label{classBitStream_a25557aa577c21b3ac62165e483ea142b}} 
+\index{BitStream@{BitStream}!writeBit@{writeBit}}
+\index{writeBit@{writeBit}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{writeBit()}{writeBit()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::write\+Bit (\begin{DoxyParamCaption}\item[{const unsigned char}]{bit }\end{DoxyParamCaption})}
+
+
+
+Write a bit to \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bit} & Bit value to be written (bit is assumed to be in the LSB). \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classBitStream_a3539e97bdb943ac9f3a75c686168b8e6}\label{classBitStream_a3539e97bdb943ac9f3a75c686168b8e6}} 
+\index{BitStream@{BitStream}!writeNBits@{writeNBits}}
+\index{writeNBits@{writeNBits}!BitStream@{BitStream}}
+\doxysubsubsection{\texorpdfstring{writeNBits()}{writeNBits()}}
+{\footnotesize\ttfamily bool Bit\+Stream\+::write\+NBits (\begin{DoxyParamCaption}\item[{const unsigned char $\ast$}]{bits,  }\item[{const unsigned int}]{n\+Bits }\end{DoxyParamCaption})}
+
+
+
+Write N bits from \mbox{\hyperlink{classBitStream}{Bit\+Stream}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bit} & Array containing bits to be writen. \\
+\hline
+{\em n\+Bits} & Number of bits to write. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True, if no errors occurred. 
+
+False, if errors occurred. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/joao/\+Desktop/\+IC/\+IC\+\_\+\+Project2/\+Part\+A\+\_\+1/classes/Bit\+Stream.\+h\item 
+/home/joao/\+Desktop/\+IC/\+IC\+\_\+\+Project2/\+Part\+A\+\_\+1/classes/Bit\+Stream.\+cpp\end{DoxyCompactItemize}

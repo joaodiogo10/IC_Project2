@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['bitstream_0',['bitStream',['../classbitStream.html',1,'bitStream'],['../classbitStream.html#a2cb5819ad699770842eba31bfdb8bfda',1,'bitStream::bitStream(const std::string file, bitStream::bs_mode mode)']]],
-  ['bs_5fmode_1',['bs_mode',['../classbitStream.html#ae311de4fc076314c55c877d10772248d',1,'bitStream']]]
+  ['bitstream_0',['BitStream',['../classBitStream.html',1,'BitStream'],['../classBitStream.html#a9b8a7522a8747bb64c8a097e531c6ac5',1,'BitStream::BitStream(const std::string file, BitStream::bs_mode mode)']]],
+  ['bs_5fmode_1',['bs_mode',['../classBitStream.html#a7cfd98bbab5562a6312be7c68169afbf',1,'BitStream']]]
 ];

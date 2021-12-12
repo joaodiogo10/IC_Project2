@@ -1,0 +1,28 @@
+\hypertarget{Golomb_8h_source}{}\doxysection{Golomb.\+h}
+\label{Golomb_8h_source}\index{/home/joao/Desktop/IC/IC\_Project2/PartA\_1/classes/Golomb.h@{/home/joao/Desktop/IC/IC\_Project2/PartA\_1/classes/Golomb.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include "{}BitStream.h"{}}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{keyword}{class }\mbox{\hyperlink{classGolomb}{Golomb}} \{}
+\DoxyCodeLine{5     \textcolor{keyword}{public}:}
+\DoxyCodeLine{6         \mbox{\hyperlink{classGolomb}{Golomb}}(\textcolor{keyword}{const} std::string filePath, \textcolor{keyword}{const} \mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{BitStream::bs\_mode}} mode, uint32\_t m);}
+\DoxyCodeLine{7         \textcolor{keywordtype}{void} setM(uint32\_t m);}
+\DoxyCodeLine{8         \textcolor{keywordtype}{void} encodeNumber(\textcolor{keyword}{const} \textcolor{keywordtype}{int} number);}
+\DoxyCodeLine{9         int32\_t decodeNumber();}
+\DoxyCodeLine{10         \textcolor{keywordtype}{bool} fillWithPadding(uint8\_t bit);}
+\DoxyCodeLine{11         \textcolor{keywordtype}{bool} fillWithPadding();}
+\DoxyCodeLine{12         }
+\DoxyCodeLine{13         \textcolor{keywordtype}{bool} close();}
+\DoxyCodeLine{14         \textcolor{keywordtype}{bool} open(std::string filePath, \mbox{\hyperlink{classBitStream_a7cfd98bbab5562a6312be7c68169afbf}{BitStream::bs\_mode}} mode);}
+\DoxyCodeLine{15         \textcolor{keywordtype}{bool} isOpen();}
+\DoxyCodeLine{16     \textcolor{keyword}{private}:}
+\DoxyCodeLine{17         uint32\_t m;}
+\DoxyCodeLine{18         \mbox{\hyperlink{classBitStream}{BitStream}} stream;}
+\DoxyCodeLine{19         uint32\_t foldNumber(\textcolor{keyword}{const} int32\_t number);}
+\DoxyCodeLine{20         int32\_t unfoldNumber(\textcolor{keyword}{const} uint32\_t number);}
+\DoxyCodeLine{21 \};}
+\DoxyCodeLine{22 }
+
+\end{DoxyCode}
