@@ -10,12 +10,12 @@ using namespace cv;
 
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
-void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
-//./ex1 image textFile m
+//./encoder image textFile m
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 4)
     {
         cout << "Not enough parameters" << endl;
         return -1;
@@ -61,47 +61,60 @@ int main(int argc, char *argv[])
     cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
     cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
-    predictor_1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
+    predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
 
     int m;
     std::istringstream myStringM((string)argv[3]);
     myStringM >> m;
 
-    Golomb encoder((string)argv[2], BitStream::bs_mode::write, m);
+    //Encode Header with fixed m = 400
+    Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
 
     //encode m
     encoder.encodeNumber(m);
+    cout << "m: " << m << endl;
+
+    //encode rows
+    encoder.encodeNumber(srcImage.rows);
+    cout << "rows " << srcImage.rows << endl;
+
+    //encode columns
+    encoder.encodeNumber(srcImage.cols);
+    cout << "colmns " << srcImage.cols << endl;
+
+    //Change encoder m
+    encoder.setM(m);
 
     //encode Y
-    uchar *pY;
-    for (int i = 0; i < YComponent.rows; i++)
+    short *pYPred;
+    for (int i = 0; i < YPredictor.rows; i++)
     {
-        pY = YComponent.ptr<uchar>(i);
-        for (int j = 0; j < YComponent.cols; j++)
+        pYPred = YPredictor.ptr<short>(i);
+        for (int j = 0; j < YPredictor.cols; j++)
         {
-            encoder.encodeNumber(pY[j]);
+            encoder.encodeNumber(pYPred[j]);
         }
     }
 
     //encode U
-    uchar *pU;
+    short *pUPred;
     for (int i = 0; i < UReducedPredictor.rows; i++)
     {
-        pU = UReducedPredictor.ptr<uchar>(i);
+        pUPred = UReducedPredictor.ptr<short>(i);
         for (int j = 0; j < UReducedPredictor.cols; j++)
         {
-            encoder.encodeNumber(pU[j]);
+            encoder.encodeNumber(pUPred[j]);
         }
     }
 
     //encode V
-    uchar *pV;
+    short *pVPred;
     for (int i = 0; i < VReducedPredictor.rows; i++)
     {
-        pV = VReducedPredictor.ptr<uchar>(i);
+        pVPred = VReducedPredictor.ptr<short>(i);
         for (int j = 0; j < VReducedPredictor.cols; j++)
         {
-            encoder.encodeNumber(pV[j]);
+            encoder.encodeNumber(pVPred[j]);
         }
     }
 
@@ -178,22 +191,25 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
     }
 }
 
-void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
 {
     uchar *pY, *pU, *pV, previous, secondPrevious;
-    short *pYNew, *pUNew, *pVNew, r;
+    short *pYPred, *pUPred, *pVPred, r;
     previous = 0;
+    int count = 0;
 
     //Predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
+
         pY = YComponent.ptr<uchar>(i);
-        pYNew = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YComponent.cols; j++)
+        pYPred = YPredictor.ptr<short>(i);
+        for (int j = 0; j < YComponent.cols; j++, count++)
         {
+
             r = pY[j] - previous;
             previous = pY[j];
-            pYNew[j] = r;
+            pYPred[j] = r;
         }
     }
 
@@ -204,18 +220,18 @@ void predictor_1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComp
     for (int i = 0; i < UComponentReduced.rows; i++)
     {
         pU = UComponentReduced.ptr<uchar>(i);
-        pUNew = UReducedPredictor.ptr<short>(i);
+        pUPred = UReducedPredictor.ptr<short>(i);
         pV = VComponentReduced.ptr<uchar>(i);
-        pVNew = VReducedPredictor.ptr<short>(i);
+        pVPred = VReducedPredictor.ptr<short>(i);
         for (int j = 0; j < UComponentReduced.cols; j++)
         {
             r = pU[j] - previous;
             previous = pU[j];
-            pUNew[j] = r;
+            pUPred[j] = r;
 
             r = pV[j] - secondPrevious;
             secondPrevious = pV[j];
-            pVNew[j] = r;
+            pVPred[j] = r;
         }
     }
 }
