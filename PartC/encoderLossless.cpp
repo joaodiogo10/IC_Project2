@@ -186,20 +186,25 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
 {
-    uchar *pY, *pU, *pV;
-    short *pYPred, *pUPred, *pVPred;
+    uchar *pY, *pU, *pV, previous, secondPrevious;
+    short *pYPred, *pUPred, *pVPred, r;
+    previous = 0;
 
     //Predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
         pY = YComponent.ptr<uchar>(i);
         pYPred = YPredictor.ptr<short>(i);
-        pYPred[0] = pY[0];
-        for (int j = 1; j < YComponent.cols; j++)
+        for (int j = 0; j < YComponent.cols; j++)
         {
-            pYPred[j] = pY[j] - pY[j - 1];
+            r = pY[j] - previous;
+            previous = pY[j];
+            pYPred[j] = r;
         }
     }
+
+    previous = 0;
+    secondPrevious = 0;
 
     //Predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
@@ -208,13 +213,15 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
         pUPred = UReducedPredictor.ptr<short>(i);
         pV = VComponentReduced.ptr<uchar>(i);
         pVPred = VReducedPredictor.ptr<short>(i);
-        pUPred[0] = pU[0];
-        pVPred[0] = pV[0];
-        for (int j = 1; j < UComponentReduced.cols; j++)
+        for (int j = 0; j < UComponentReduced.cols; j++)
         {
-            pUPred[j] = pU[j] - pU[j - 1];
+            r = pU[j] - previous;
+            previous = pU[j];
+            pUPred[j] = r;
 
-            pVPred[j] = pV[j] - pV[j - 1];
+            r = pV[j] - secondPrevious;
+            secondPrevious = pV[j];
+            pVPred[j] = r;
         }
     }
 }
