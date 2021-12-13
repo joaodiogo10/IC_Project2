@@ -1,4 +1,4 @@
-#include "classes/Golomb.h"
+#include "Golomb.h"
 #include "AudioFile/AudioFile.h"
 #include <sstream>
 #include <math.h>
@@ -8,7 +8,7 @@ const int m = 4;
 void redundancy(AudioFile<double> audioFile){
     Golomb golomb("encoded", BitStream::bs_mode::write, m);
 
-    int numChannels = audioFile.getNumChannels();
+    //int numChannels = audioFile.getNumChannels();
     int numSamples = audioFile.getNumSamplesPerChannel();
 
     std::vector<double> left = audioFile.samples[0];
@@ -29,25 +29,53 @@ void redundancy(AudioFile<double> audioFile){
 void prediction(AudioFile<double> audioFile){
     Golomb golomb("encoded2", BitStream::bs_mode::write, m);
 
-    int numChannels = audioFile.getNumChannels();
     int numSamples = audioFile.getNumSamplesPerChannel();
 
-    int p, previous;
-    int pPred, r;
-    previous = 0;
+    std::vector<double> left = audioFile.samples[0];
+    std::vector<double> right = audioFile.samples[1];
 
+    int r, previous = 0;
     
     for(int i = 0; i < numSamples; i++){
-        p = audioFile.samples[i];
-        pPred = audioFile.samples[i];
-        r = i - previous;
-        previous = i;
-        pPred = r;
+        r = left[i] - previous;
+        golomb.encodeNumber(r);
+        previous = left[i];
     }
-
-    golomb.encodeNumber(pPred);
-
 } 
+
+int polynomialPredictor(AudioFile<double> audioFile) {
+    Golomb golomb("encoded2", BitStream::bs_mode::write, m);
+
+    int numSamples = audioFile.getNumSamplesPerChannel();
+
+    std::vector<double> left = audioFile.samples[0];
+    std::vector<double> right = audioFile.samples[1];
+
+    int r, previous = 0;
+    int Xn_1, Xn_2, Xn_3;
+
+    Xn_1 = left[0];
+    r = 0 - left[0];
+    golomb.encodeNumber(r);
+    
+    Xn_2 = left[1];
+    r = Xn_1 - left[1];
+    golomb.encodeNumber(r);
+
+    r = (2*Xn_1 - Xn_2) - left[2];
+    Xn_3 = left[2];
+    golomb.encodeNumber(r);
+
+    for(int i = 3; i < numSamples; i++){
+        int sample = left[i];
+        r = (3*Xn_1 - 3*Xn_2 + Xn_3) - sample;
+        Xn_3 = Xn_2;
+        Xn_2 = Xn_1;
+        Xn_1 = sample;
+
+        golomb.encodeNumber(r);
+    }
+}
 
 int main(int argc, char * argv[]){
     AudioFile<double> audioFile;
