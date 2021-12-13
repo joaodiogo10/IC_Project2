@@ -6,8 +6,6 @@
 using namespace std;
 using namespace cv;
 
-//Agr da malloc para a imagem house.ppm na funçao yuv
-
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
@@ -17,7 +15,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 4)
     {
-        cout << "Not enough parameters" << endl;
+        cout << "Usage: ./encoder ImageName TextFile m" << endl;
         return -1;
     }
 
@@ -72,15 +70,12 @@ int main(int argc, char *argv[])
 
     //encode m
     encoder.encodeNumber(m);
-    cout << "m: " << m << endl;
 
     //encode rows
     encoder.encodeNumber(srcImage.rows);
-    cout << "rows " << srcImage.rows << endl;
 
     //encode columns
     encoder.encodeNumber(srcImage.cols);
-    cout << "colmns " << srcImage.cols << endl;
 
     //Change encoder m
     encoder.setM(m);
@@ -134,16 +129,16 @@ int main(int argc, char *argv[])
 
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent)
 {
-    int channels = source.channels();
 
     int nRows = source.rows;
-    int nCols = source.cols * channels;
+    int nCols = source.cols;
 
     /*
     Y = 0.299R + 0.587G + 0.114B
     Cb = 128 − 0.168736R − 0.331264G + 0.5B
     Cr = 128 + 0.5R − 0.418688G − 0.081312B 
     */
+
     uchar *pY, *pU, *pV;
     for (int i = 0; i < nRows; i++)
     {
@@ -163,10 +158,8 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced)
 {
-    int channels = YComponent.channels();
-
     int nRows = YComponent.rows;
-    int nCols = YComponent.cols * channels;
+    int nCols = YComponent.cols;
 
     uchar *pU, *pV, *pUReduced, *pVReduced;
     int countRow = 0;

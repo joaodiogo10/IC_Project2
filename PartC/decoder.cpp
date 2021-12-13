@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cout << "Not enough parameters" << endl;
+        cout << "Usage: ./decoder TextFile" << endl;
         return -1;
     }
 
@@ -23,11 +23,8 @@ int main(int argc, char *argv[])
     Golomb decoder((string)argv[1], BitStream::bs_mode::read, 400);
 
     m = decoder.decodeNumber();
-    cout << "m: " << m << endl;
     rows = decoder.decodeNumber();
-    cout << "rows " << rows << endl;
     cols = decoder.decodeNumber();
-    cout << "colmns " << cols << endl;
 
     int halfRows = rows / 2;
     int halfCols = cols / 2;
