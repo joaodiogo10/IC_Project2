@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cout << "Usage: ./decoder TextFile" << endl;
+        cout << "Usage: ./decoderLossless TextFile" << endl;
         return -1;
     }
 
@@ -100,24 +100,20 @@ int main(int argc, char *argv[])
 void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
 {
 
-    uchar *pY, *pU, *pV, previous, secondPrevious;
+    uchar *pY, *pU, *pV;
     short *pYPred, *pUPred, *pVPred;
-    previous = 0;
 
     //Reverse predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
         pY = YComponent.ptr<uchar>(i);
         pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YComponent.cols; j++)
+        pY[0] = pYPred[0];
+        for (int j = 1; j < YComponent.cols; j++)
         {
-            pY[j] = pYPred[j] + previous;
-            previous = pY[j];
+            pY[j] = pYPred[j] + pY[j - 1];
         }
     }
-
-    previous = 0;
-    secondPrevious = 0;
 
     //Reverse predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
@@ -126,13 +122,13 @@ void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
         pUPred = UReducedPredictor.ptr<short>(i);
         pV = VComponentReduced.ptr<uchar>(i);
         pVPred = VReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < UComponentReduced.cols; j++)
+        pU[0] = pUPred[0];
+        pV[0] = pVPred[0];
+        for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pU[j] = pUPred[j] + previous;
-            previous = pU[j];
+            pU[j] = pUPred[j] + pU[j - 1];
 
-            pV[j] = pVPred[j] + secondPrevious;
-            secondPrevious = pV[j];
+            pV[j] = pVPred[j] + pV[j - 1];
         }
     }
 }
