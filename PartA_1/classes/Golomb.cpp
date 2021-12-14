@@ -58,13 +58,15 @@ void Golomb::encodeNumber(const int32_t number) {
     {
         nBits = nBitsMin;
         //shift remainder
-        r = r >> 1;
+        r = (threshold/2) + r - threshold;
     }
+
     uint8_t bitPos = nBits; 
     do {
         bitPos--;
         int32_t mask = std::pow(2, bitPos);
         int8_t bit = (r & mask) >> bitPos;
+
         stream.writeBit(bit);
 
     }while(bitPos != 0);
@@ -101,15 +103,17 @@ int32_t Golomb::decodeNumber() {
     }
 
     uint32_t threshold = (m - std::pow(2,nBitsMin)) * 2; 
-    r = r << 1;        
 
-    if(r < threshold) {
+    if(r  < (threshold/2)) {
         stream.readBit(bit);
-
+        r = r << 1;
         r = r | bit;
     }
-
+    else {
+        r = (threshold/2) + r;
+    }
     number = q * m + r;
+
     return unfoldNumber(number);
 }
 

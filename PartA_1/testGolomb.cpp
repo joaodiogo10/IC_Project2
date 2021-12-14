@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     // 10 0     4
     // 10 1     5
     // 11       6
-    Golomb encoder(testFile, BitStream::bs_mode::write, 7);
+    Golomb encoder(testFile, BitStream::bs_mode::write, 9);
     
     
     // folding: 20 -> 40
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     std::cout << "-------Test decoder-------" << std::endl;
 
-    Golomb decoder(testFile, BitStream::bs_mode::read, 7);
+    Golomb decoder(testFile, BitStream::bs_mode::read, 9);
     int32_t number;
 
     number = decoder.decodeNumber();
