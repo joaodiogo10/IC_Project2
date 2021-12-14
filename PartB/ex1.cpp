@@ -1,9 +1,9 @@
-#include "Golomb.h"
+#include "../PartA_1/classes/Golomb.h"
 #include "AudioFile/AudioFile.h"
 #include <sstream>
 #include <math.h>
 
-const int m = 4;
+const int m = 7;
 
 void redundancy(AudioFile<double> audioFile){
     Golomb golomb("encoded", BitStream::bs_mode::write, m);
@@ -26,24 +26,24 @@ void redundancy(AudioFile<double> audioFile){
     golomb.encodeNumber(y);
 }
 
-void prediction(AudioFile<double> audioFile){
-    Golomb golomb("encoded2", BitStream::bs_mode::write, m);
+// void prediction(AudioFile<double> audioFile){
+//     Golomb golomb("encoded2", BitStream::bs_mode::write, m);
 
-    int numSamples = audioFile.getNumSamplesPerChannel();
+//     int numSamples = audioFile.getNumSamplesPerChannel();
 
-    std::vector<double> left = audioFile.samples[0];
-    std::vector<double> right = audioFile.samples[1];
+//     std::vector<double> left = audioFile.samples[0];
+//     std::vector<double> right = audioFile.samples[1];
 
-    int r, previous = 0;
+//     int r, previous = 0;
     
-    for(int i = 0; i < numSamples; i++){
-        r = left[i] - previous;
-        golomb.encodeNumber(r);
-        previous = left[i];
-    }
-} 
+//     for(int i = 0; i < numSamples; i++){
+//         r = left[i] - previous;
+//         golomb.encodeNumber(r);
+//         previous = left[i];
+//     }
+// } 
 
-int polynomialPredictor(AudioFile<double> audioFile) {
+void polynomialPredictor(AudioFile<double> audioFile) {
     Golomb golomb("encoded2", BitStream::bs_mode::write, m);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -77,13 +77,18 @@ int polynomialPredictor(AudioFile<double> audioFile) {
     }
 }
 
+void predictorDecoder(char * filepath){
+    Golomb golomb("decodedFile2", BitStream::bs_mode::read, m);
+    
+}
+
 int main(int argc, char * argv[]){
     AudioFile<double> audioFile;
     audioFile.load(argv[1]);
 
     redundancy(audioFile);
 
-    prediction(audioFile);
+    polynomialPredictor(audioFile);
 
     return 0;
 }
