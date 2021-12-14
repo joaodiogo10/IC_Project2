@@ -13,21 +13,21 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cout << "Not enough parameters" << endl;
+        cout << "Usage: ./decoderLossy TextFile" << endl;
         return -1;
     }
 
-    int32_t m, rows, cols;
+    int32_t m, rows, cols, reduceY, reduceU, reduceV;
 
     //Decode header with fixed m = 400
     Golomb decoder((string)argv[1], BitStream::bs_mode::read, 400);
 
     m = decoder.decodeNumber();
-    cout << "m: " << m << endl;
     rows = decoder.decodeNumber();
-    cout << "rows " << rows << endl;
     cols = decoder.decodeNumber();
-    cout << "colmns " << cols << endl;
+    reduceY = decoder.decodeNumber();
+    reduceU = decoder.decodeNumber();
+    reduceV = decoder.decodeNumber();
 
     int halfRows = rows / 2;
     int halfCols = cols / 2;
@@ -51,36 +51,47 @@ int main(int argc, char *argv[])
     cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
     cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
-    //encode Y
+    //Acho q esta a dar overflow nos shifts ns, apartir de 8 de reduçao é irreconhecivel
+
+    //decode Y
     short *pYPred;
     for (int i = 0; i < YPredictor.rows; i++)
     {
         pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YPredictor.cols; j++)
+        pYPred[0] = decoder.decodeNumber();
+
+        for (int j = 1; j < YPredictor.cols; j++)
         {
             pYPred[j] = decoder.decodeNumber();
+            pYPred[j] = pYPred[j] << reduceY;
         }
     }
 
-    //encode U
+    //decode U
     short *pUPred;
     for (int i = 0; i < UReducedPredictor.rows; i++)
     {
         pUPred = UReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < UReducedPredictor.cols; j++)
+        pUPred[0] = decoder.decodeNumber();
+
+        for (int j = 1; j < UReducedPredictor.cols; j++)
         {
             pUPred[j] = decoder.decodeNumber();
+            pUPred[j] = pUPred[j] << reduceU;
         }
     }
 
-    //encode V
+    //decode V
     short *pVPred;
     for (int i = 0; i < VReducedPredictor.rows; i++)
     {
         pVPred = VReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < VReducedPredictor.cols; j++)
+        pVPred[0] = decoder.decodeNumber();
+
+        for (int j = 1; j < VReducedPredictor.cols; j++)
         {
             pVPred[j] = decoder.decodeNumber();
+            pVPred[j] = pVPred[j] << reduceV;
         }
     }
 
@@ -103,24 +114,20 @@ int main(int argc, char *argv[])
 void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
 {
 
-    uchar *pY, *pU, *pV, previous, secondPrevious;
+    uchar *pY, *pU, *pV;
     short *pYPred, *pUPred, *pVPred;
-    previous = 0;
 
     //Reverse predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
         pY = YComponent.ptr<uchar>(i);
         pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YComponent.cols; j++)
+        pY[0] = pYPred[0];
+        for (int j = 1; j < YComponent.cols; j++)
         {
-            pY[j] = pYPred[j] + previous;
-            previous = pY[j];
+            pY[j] = pYPred[j] + pY[j - 1];
         }
     }
-
-    previous = 0;
-    secondPrevious = 0;
 
     //Reverse predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
@@ -129,13 +136,13 @@ void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
         pUPred = UReducedPredictor.ptr<short>(i);
         pV = VComponentReduced.ptr<uchar>(i);
         pVPred = VReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < UComponentReduced.cols; j++)
+        pU[0] = pUPred[0];
+        pV[0] = pVPred[0];
+        for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pU[j] = pUPred[j] + previous;
-            previous = pU[j];
+            pU[j] = pUPred[j] + pU[j - 1];
 
-            pV[j] = pVPred[j] + secondPrevious;
-            secondPrevious = pV[j];
+            pV[j] = pVPred[j] + pV[j - 1];
         }
     }
 }
