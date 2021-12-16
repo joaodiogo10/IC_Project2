@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include "BitStream.h"
 
 /** 
@@ -69,6 +70,15 @@ class Golomb {
          * \return false, if \ref BitStream is closed.
          */
         bool isOpen();
+
+        /**
+         * \brief Get optimal M for a given distribution of values
+         * 
+         * \param values vector contains all values
+         * \return uint optimal M
+         */
+        static uint getOtimizedM(std::vector<int> values);
+        
     private:
         uint32_t m;
         BitStream stream;

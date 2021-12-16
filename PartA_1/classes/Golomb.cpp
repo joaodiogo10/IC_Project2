@@ -146,3 +146,18 @@ bool Golomb::open(std::string filePath, BitStream::bs_mode mode) {
 bool Golomb::isOpen() {
     return stream.isOpen();   
 }
+
+uint Golomb::getOtimizedM(std::vector<int> values) {
+    double sum = 0;
+    for(int value : values) {
+        sum += std::abs(value);
+    }
+    double mean = sum / values.size();
+
+    uint m = (uint) std::ceil( -1 / std::log2( mean / (mean + 1.0) ) ); 
+
+    if(m == 0)
+        return 1;
+
+    return m;
+} 

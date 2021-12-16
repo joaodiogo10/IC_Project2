@@ -9,6 +9,7 @@ using namespace cv;
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 //./encoder image textFile m
 int main(int argc, char *argv[])
@@ -61,13 +62,15 @@ int main(int argc, char *argv[])
 
     predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
 
-    int m;
+    uint32_t m;
     std::istringstream myStringM((string)argv[3]);
     myStringM >> m;
 
     //Encode Header with fixed m = 400
-    Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
+    Golomb encoder((string)argv[2], BitStream::bs_mode::write, 200);
 
+    m = getOptimalM(YPredictor, UReducedPredictor, VReducedPredictor);
+    std::cout << m << std::endl;
     //encode m
     encoder.encodeNumber(m);
 
@@ -112,8 +115,6 @@ int main(int argc, char *argv[])
             encoder.encodeNumber(pVPred[j]);
         }
     }
-
-    //tenho de fzr fillWithPadding ???
 
     encoder.close();
 
@@ -217,4 +218,54 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
             pVPred[j] = pV[j] - pV[j - 1];
         }
     }
+}
+
+uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+    uint32_t m = 0;
+    std::vector<int> values;
+    uint32_t size = YPredictor.rows * YPredictor.cols + UReducedPredictor.rows \
+                  * UReducedPredictor.cols + VReducedPredictor.rows * VReducedPredictor.cols; 
+
+    values.resize(size);
+    uint32_t valuesCount = 0;
+
+    short *pYPred;
+    for (int i = 0; i < YPredictor.rows; i++)
+    {
+        pYPred = YPredictor.ptr<short>(i);
+        for (int j = 0; j < YPredictor.cols; j++)
+        {
+            values[valuesCount] = pYPred[j];
+            valuesCount++;
+        }
+    }
+
+    //encode U
+    short *pUPred;
+    for (int i = 0; i < UReducedPredictor.rows; i++)
+    {
+        pUPred = UReducedPredictor.ptr<short>(i);
+        for (int j = 0; j < UReducedPredictor.cols; j++)
+        {
+
+            values[valuesCount] = pUPred[j];
+            valuesCount++;
+        }
+    }
+    
+    //encode V
+    short *pVPred;
+    for (int i = 0; i < VReducedPredictor.rows; i++)
+    {
+        pVPred = VReducedPredictor.ptr<short>(i);
+        for (int j = 0; j < VReducedPredictor.cols; j++)
+        {
+            values[valuesCount] = pVPred[j];
+            valuesCount++;
+        }
+    }
+
+    m = Golomb::getOtimizedM(values);
+
+    return m;
 }

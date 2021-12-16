@@ -43,6 +43,10 @@ int main(int argc, char *argv[])
     //Change decoder m
     decoder.setM(m);
 
+    // ------------------------------------
+    // Estes nomes nao sao mto intuitivos "Predictor" nao faz sentido
+    // O que está guardado na matrix sao os residuais
+    // ------------------------------------
     //Matrices for predictor values
     cv::Mat YPredictor = cv::Mat::zeros(rows, cols, CV_32SC1);
     cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
