@@ -150,7 +150,7 @@ bool Golomb::isOpen() {
 uint Golomb::getOtimizedM(std::vector<int> values) {
     double sum = 0;
     for(int value : values) {
-        sum += std::abs(value);
+        sum += foldNumber(value);
     }
     double mean = sum / values.size();
 

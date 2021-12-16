@@ -29,9 +29,10 @@ bool test2(uint16_t m);
 
 int main(int argc, char *argv[])
 {
-
+    std::cout << "------------Test1------------" << std::endl;
     test1();
 
+    std::cout << "------------Test2------------" << std::endl;
     bool testPassed = true;
     //test m = 1 to m = 500
     for(int i = 1; i <= 500; i++ ) {
@@ -49,7 +50,6 @@ int main(int argc, char *argv[])
 }
 
 void test1() {
-    std::cout << "-------Test encoder-------" << std::endl;
     std::cout << "Writing numbers: 20, -15, -7, 2" << std::endl;
     // m = 7 
     // Reaminder representation
@@ -103,8 +103,6 @@ void test1() {
 
     //file result: 0000 0110 . 1000 0100 . 1011 1010 . 0000 0000(06 84 BA 00)    
     encoder.close();
-
-    std::cout << "-------Test decoder-------" << std::endl;
 
     Golomb decoder(testFile1, BitStream::bs_mode::read, 7);
     int32_t number;

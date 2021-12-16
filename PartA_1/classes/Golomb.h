@@ -82,7 +82,7 @@ class Golomb {
     private:
         uint32_t m;
         BitStream stream;
-        uint32_t foldNumber(const int32_t number);
-        int32_t unfoldNumber(const uint32_t number);
+        static uint32_t foldNumber(const int32_t number);
+        static int32_t unfoldNumber(const uint32_t number);
 };
 
