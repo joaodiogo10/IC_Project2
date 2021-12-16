@@ -47,5 +47,6 @@ CTestTestfile.cmake
 _deps
 
 build
-
+html
+latex
 
