@@ -2,6 +2,10 @@
 #include "math.h"
 
 Golomb::Golomb(const std::string filePath, const BitStream::bs_mode mode, uint32_t m) : stream(filePath, mode){
+    if(m == 0) {
+        printf("ERROR: m can't be 0");
+        throw "M cannot be 0!";
+    }
     this->m = m;
 }
 

@@ -1,14 +1,38 @@
 #include "BitStream.h"
 
+/** \file 
+ *  Run test for class BitStream. Results are printed to console.
+*/
+
+/**
+ * \brief Test \ref BitStream::writeBit 
+ */
 void testWriteBit(char c, BitStream &oStream);
+
+/**
+ * \brief Test \ref BitStream::readBit and BitStream::readNBits.
+ * 
+ * Results are printed to the console. Printed character or decimal values should match, if not something went wrong.\n
+ * 
+ * <pre>
+ * Ex:\n
+ * #: #     - read expected value\n 
+ * #: c     - read don't match expected value\n 
+ * </pre>
+ */
 void testReadNBits();
+/**
+ * \brief Test \ref BitStream::writeNBits 
+ */
 void testWriteNBits();
 
-std::string test1File = "testBitStream1.txt";
-std::string test2File = "testBitStream2.txt";
+std::string test1File = "testBitStream1.txt"; /*!< first test file */
+std::string test2File = "testBitStream2.txt"; /*!< second test file */
 
 int main(int argc, char *argv[])
 {
+    //----------Test 1---------
+    //-------------------------
     BitStream oStream(test1File, BitStream::bs_mode::write);
     // 0010 0011 #
     testWriteBit('#', oStream);
@@ -22,6 +46,9 @@ int main(int argc, char *argv[])
     oStream.close();
 
     testReadNBits();
+
+    //----------Test 2---------
+    //-------------------------
     testWriteNBits();
    
     return 0;
