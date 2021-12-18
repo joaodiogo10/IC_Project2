@@ -114,7 +114,7 @@ void redundancyDecoder(char * filePath){
 }
  */
 
-void prediction(AudioFile<double> audioFile){
+void firstOrderPredictorEncoder(AudioFile<double> audioFile) {
     Golomb golomb(encoderOuputFile, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -141,7 +141,7 @@ void prediction(AudioFile<double> audioFile){
     }
 } 
 
-void predictorDecoder(std::string filepath){
+void firstOrderPredictorDecoder(std::string filepath) {
     Golomb decoder(filepath, BitStream::bs_mode::read, headerM);
 
     int32_t M = decoder.decodeNumber();
@@ -199,8 +199,8 @@ int main(int argc, char * argv[]){
     audioFile.load(argv[1]);
 
     std::string filePath = argv[1];
-    prediction(audioFile);
-    predictorDecoder(encoderOuputFile);
+    firstOrderPredictorEncoder(audioFile);
+    firstOrderPredictorDecoder(encoderOuputFile);
 
     return 0;
 }
