@@ -4,7 +4,6 @@
 #include <math.h>
 
 const uint16_t headerM = 200;
-const std::string encoderOuputFile = "encodedRed";
 
 std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth) {
     int maxValue = std::pow(2, bitDepth);
@@ -251,30 +250,6 @@ void polynomialDecoder(std::string filePath){
     left[2] = (2*Xn_1 - Xn_2) - r;
     Xn_3 = left[2];
 
-    // Xn_1 = left[0];
-    // r = 0 - left[0];
-    // encodedResiduals[0] = r;
-    // golomb.encodeNumber(r);
-    
-    // Xn_2 = left[1];
-    // r = Xn_1 - left[1];
-    // encodedResiduals[1] = r;
-    // golomb.encodeNumber(r);
-
-    // r = (2*Xn_1 - Xn_2) - left[2];
-    // Xn_3 = left[2];
-    // encodedResiduals[2] = r;
-    // golomb.encodeNumber(r);
-
-    // int sample = left[i];
-    //     r = (3*Xn_1 - 3*Xn_2 + Xn_3) - sample;
-    //     Xn_3 = Xn_2;
-    //     Xn_2 = Xn_1;
-    //     Xn_1 = sample;
-
-    //     encodedResiduals[i] = r;
-    //     golomb.encodeNumber(r);
-
     for(int i = 3; i < numSamples; i++){
         r = decoder.decodeNumber();
         left[i] = (3*Xn_1 - 3*Xn_2 + Xn_3) - r;
@@ -329,7 +304,7 @@ void polynomialDecoder(std::string filePath){
 }
 
 std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
-    Golomb golomb(encoderOuputFile, BitStream::bs_mode::write, headerM);
+    Golomb golomb("encoded", BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
     int bitDepth = audioFile.getBitDepth();
@@ -418,13 +393,60 @@ void firstOrderPredictorDecoder(std::string filepath) {
     audioFile.save("decodedFilePredictor.wav");
 }
 
-int main(int argc, char * argv[]){
-    AudioFile<double> audioFile;
-    audioFile.load(argv[1]);
+int main(){
+    std::cout << "Do you want to encode or decode the file?" << std::endl;
+    std::cout << "1 - encode" << std::endl;
+    std::cout << "2 - decode" << std::endl;
+    int choice1;
+    std::cin >> choice1;
 
-    std::string filePath = argv[1];
-    redundancy(audioFile);
-    redundancyDecoder(encoderOuputFile);
+    if(choice1 == 1){
+        int choice2;
+        AudioFile<double> audioFile;
+        std::cout << "predictor or redundancy?" << std::endl;
+        std::cout << "1 - predictor" << std::endl;
+        std::cout << "2 - redundancy" << std::endl;
+        std::cin >> choice2;
+
+        if(choice2 == 1){
+            std::string path;
+            std::cout << "choose the path of the file to encode" << std::endl;
+            std::cin >> path;
+            audioFile.load(path);
+            polynomialPredictor(audioFile);
+        }
+
+        else if(choice2 == 2){
+            std::string path;
+            std::cout << "choose the path of the file to encode" << std::endl;
+            std::cin >> path;
+            audioFile.load(path);
+            redundancy(audioFile);
+        }
+
+    }
+
+    else if(choice1 == 2){
+        int choice2;
+        std::cout << "predictor or redundancy?" << std::endl;
+        std::cout << "1 - predictor" << std::endl;
+        std::cout << "2 - redundancy" << std::endl;
+        std::cin >> choice2;
+
+        if(choice2 == 1){
+            std::string path;
+            std::cout << "choose the path of the file to decode" << std::endl;
+            std::cin >> path;
+            polynomialDecoder(path);
+        }
+
+        else if(choice2 == 2){
+            std::string path;
+            std::cout << "choose the path of the file to encode" << std::endl;
+            std::cin >> path;
+            redundancyDecoder(path);
+        }
+    }
 
     return 0;
 }
