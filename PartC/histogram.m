@@ -31,5 +31,6 @@ function e = plotResult(dir,fig)
     plot(axis, y, 'b', axis, u, 'r', axis, v, 'g');
     legend("Y","U", "V")
     xlabel("Residuals");
+    xlim([-255,255]);
     grid on;
 end
