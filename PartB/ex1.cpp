@@ -3,9 +3,33 @@
 #include <sstream>
 #include <math.h>
 
-const int m = 7;
+const uint16_t headerM = 200;
+const std::string encoderOuputFile = "encoded2";
 
-void redundancy(AudioFile<double> audioFile){
+std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth) {
+    int maxValue = std::pow(2, bitDepth);
+    std::vector<int> integerChannel;
+    integerChannel.resize(channel.size());
+
+    for(size_t i = 0; i < channel.size(); i++) {
+        integerChannel[i] = channel[i] * maxValue;
+    }
+    return  integerChannel;
+}
+
+std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channel, const int bitDepth){
+    int maxValue = std::pow(2, bitDepth);
+    std::vector<double> doubleChannel;
+    doubleChannel.resize(channel.size());
+
+    for(size_t i = 0; i < channel.size(); i++) {
+        doubleChannel[i] = channel[i] / (double) maxValue;
+    }
+    return  doubleChannel;
+}
+
+
+/* void redundancy(AudioFile<double> audioFile){
     Golomb golomb("encoded", BitStream::bs_mode::write, m);
 
     //int numChannels = audioFile.getNumChannels();
@@ -29,25 +53,8 @@ void redundancy(AudioFile<double> audioFile){
 void redundancyDecoder(char * filePath){
 
 }
-
-// void prediction(AudioFile<double> audioFile){
-//     Golomb golomb("encoded2", BitStream::bs_mode::write, m);
-
-//     int numSamples = audioFile.getNumSamplesPerChannel();
-
-//     std::vector<double> left = audioFile.samples[0];
-//     std::vector<double> right = audioFile.samples[1];
-
-//     int r, previous = 0;
-    
-//     for(int i = 0; i < numSamples; i++){
-//         r = left[i] - previous;
-//         golomb.encodeNumber(r);
-//         previous = left[i];
-//     }
-// } 
-
-void polynomialPredictor(AudioFile<double> audioFile) {
+ */
+/* void polynomialPredictor(AudioFile<double> audioFile) {
     Golomb golomb("encoded2", BitStream::bs_mode::write, m);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -105,21 +112,51 @@ void polynomialPredictor(AudioFile<double> audioFile) {
         golomb.encodeNumber(r);
     }
 }
+ */
 
-void predictorDecoder(char * filepath){
-    Golomb decoder(filepath, BitStream::bs_mode::read, m);
+void prediction(AudioFile<double> audioFile){
+    Golomb golomb(encoderOuputFile, BitStream::bs_mode::write, headerM);
 
-    int M = decoder.decodeNumber();
-    int numSamples = decoder.decodeNumber();
+    int numSamples = audioFile.getNumSamplesPerChannel();
+    int bitDepth = audioFile.getBitDepth();
+    std::vector<int> left = convertChannelAmplitudeToInteger(audioFile.samples[0], bitDepth);
+    std::vector<int> right = convertChannelAmplitudeToInteger(audioFile.samples[1], bitDepth);
 
-    int r, previous, valor = 0;
+    int m = golomb.getOtimizedM(left);
+    golomb.encodeNumber(m);
+    golomb.encodeNumber(numSamples);
+    golomb.encodeNumber(bitDepth);
 
-    std::vector<double> left = [];
-    std::vector<double> right = [];
+    golomb.setM(m);
+    int r, previous = 0;
+    for(int i = 0; i < numSamples; i++){
+        r = left[i] - previous;
+        golomb.encodeNumber(r);
+        previous = left[i];
+    }
+    for(int i = 0; i < numSamples; i++){
+        r = right[i] - previous;
+        golomb.encodeNumber(r);
+        previous = right[i];
+    }
+} 
 
-    AudioFile<double> audioFile;
-    AudioFile<double>::AudioBuffer buffer;
+void predictorDecoder(std::string filepath){
+    Golomb decoder(filepath, BitStream::bs_mode::read, headerM);
 
+    int32_t M = decoder.decodeNumber();
+    int32_t numSamples = decoder.decodeNumber();
+    int32_t bitDepth = decoder.decodeNumber();
+
+    decoder.setM(M);
+
+    std::vector<int> left;
+    left.resize(numSamples);
+
+    std::vector<int> right;
+    right.resize(numSamples);
+
+    int r, previous;
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber();
         left[i] = r + previous;
@@ -130,26 +167,29 @@ void predictorDecoder(char * filepath){
         r = decoder.decodeNumber();
         right[i] = r + previous;
         previous = right[i];
-    }
+    } 
+    std::vector<double> leftDouble = revertChannelAmplitudeToDouble(left,bitDepth);
+    std::vector<double> rightDouble = revertChannelAmplitudeToDouble(right,bitDepth);
+    
+    AudioFile<double> audioFile;
+    AudioFile<double>::AudioBuffer buffer;
 
     buffer.resize(2);
+    buffer[0].resize(numSamples);
+    buffer[1].resize(numSamples);
 
-    buffer[0].resize(100000);
-    buffer[1].resize(100000);
-
-    int numChannels = 2;
-    int numSamplesPerChannel = 100000;
-    float sampleRate = 44100.f;
-    float frequency = 400.f;
-
-    for(int i = 0; i < numSamplesPerChannel; i++){
-        float sample = sinf(2. * M_PI * ((float) i / sampleRate) * frequency);
-
-        for(int channel = 0; channel < numChannels; channel++)
-            buffer[channel][i] = sample * 0.5;
+    for(int i = 0; i < numSamples; i++){
+        buffer[0][i] = leftDouble[i];
     }
-
+    for(int i = 0; i < numSamples; i++){
+        buffer[1][i] = rightDouble[i];
+    }
+    audioFile.setNumSamplesPerChannel(numSamples);
     bool ok = audioFile.setAudioBuffer(buffer);
+
+    if(!ok)
+        std::cout << "ERROR: Unable to create audioFile!" << std::endl;
+
 
     audioFile.save("decodedFilePredictor.wav");
 }
@@ -158,9 +198,9 @@ int main(int argc, char * argv[]){
     AudioFile<double> audioFile;
     audioFile.load(argv[1]);
 
-    redundancy(audioFile);
-
-    polynomialPredictor(audioFile);
+    std::string filePath = argv[1];
+    prediction(audioFile);
+    predictorDecoder(encoderOuputFile);
 
     return 0;
 }
