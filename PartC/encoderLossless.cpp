@@ -12,12 +12,12 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 void writeMatlabVectorFiles(map<int, int> &mapY, map<int, int> &mapU, map<int, int> &mapV);
 
-//./encoder image textFile m
+//./encoder image textFile
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 3)
     {
-        cout << "Usage: ./encoderLossless ImageName TextFile m" << endl;
+        cout << "Usage: ./encoderLossless ImageName TextFile" << endl;
         return -1;
     }
 
@@ -64,14 +64,13 @@ int main(int argc, char *argv[])
     predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
 
     uint32_t m;
-    std::istringstream myStringM((string)argv[3]);
-    myStringM >> m;
 
-    //Encode Header with fixed m = 400
+    //Encode Header with fixed m = 200
     Golomb encoder((string)argv[2], BitStream::bs_mode::write, 200);
 
     m = getOptimalM(YPredictor, UReducedPredictor, VReducedPredictor);
-    std::cout << m << std::endl;
+    std::cout << "Optimal m: " << m << std::endl;
+
     //encode m
     encoder.encodeNumber(m);
 
