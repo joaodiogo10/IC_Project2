@@ -55,6 +55,9 @@ void polynomialPredictor(AudioFile<double> audioFile) {
     std::vector<double> left = audioFile.samples[0];
     std::vector<double> right = audioFile.samples[1];
 
+    golomb.encodeNumber(m);
+    golomb.encodeNumber(numSamples);
+
     int r = 0;
     int Xn_1, Xn_2, Xn_3;
 
@@ -106,12 +109,28 @@ void polynomialPredictor(AudioFile<double> audioFile) {
 void predictorDecoder(char * filepath){
     Golomb decoder(filepath, BitStream::bs_mode::read, m);
 
-    m = decoder.decodeNumber();
+    int M = decoder.decodeNumber();
+    int numSamples = decoder.decodeNumber();
 
-    int numSamples = 0;
+    int r, previous, valor = 0;
+
+    std::vector<double> left = [];
+    std::vector<double> right = [];
 
     AudioFile<double> audioFile;
     AudioFile<double>::AudioBuffer buffer;
+
+    for(int i = 0; i < numSamples; i++){
+        r = decoder.decodeNumber();
+        left[i] = r + previous;
+        previous = left[i];
+    }
+
+    for(int i = 0; i < numSamples; i++){
+        r = decoder.decodeNumber();
+        right[i] = r + previous;
+        previous = right[i];
+    }
 
     buffer.resize(2);
 
