@@ -2,9 +2,86 @@
 #include "AudioFile/AudioFile.h"
 #include <sstream>
 #include <math.h>
+#include <map>
 
 const uint16_t headerM = 200;
 const std::string encoderOuputFile = "encoded2";
+
+void writeMatlabVectorFiles(const std::vector<std::map<int,int>> &residualsMap) {
+    const std::map<int,int> channel1 = residualsMap[0];
+    const std::map<int,int> channel2 = residualsMap[1];
+
+    std::ofstream channel1File("matlab/channel1.txt");
+    std::ofstream channel2File("matlab/channel2.txt");
+
+    //write channel1File (amplitude values)
+    for(auto itr = channel1.begin(); itr != channel1.end(); itr++) {
+        channel1File << (*itr).second << std::endl;        
+    }
+
+    //write channel2File (amplitude values)
+    for(auto itr = channel2.begin(); itr != channel2.end(); itr++) {
+        channel2File << (*itr).second << std::endl;        
+    }
+
+    channel1File.close();
+    channel2File.close();
+}
+
+std::vector<double> calculateEntropyAndResidualHistograms(const std::vector<std::vector<int>> &residuals, const int bitDepth) {
+    std::vector<int> channel1 = residuals[0];
+    std::vector<int> channel2 = residuals[1];
+
+    int numSamples = channel1.size();
+    
+    int nValues = std::pow(2,bitDepth);
+
+    std::vector<std::map<int,int>> residualsMap;
+    residualsMap.resize(2);
+    //initialize maps containing sample count at 0
+    for(int i = -nValues/2; i <= nValues/2; i++) {
+        residualsMap[0][i] = 0;
+    }
+    for(int i = -nValues/2; i <= nValues/2; i++) {
+        residualsMap[1][i] = 0;
+    }
+    //count residuals frequency
+    int residual;
+    for(int i = 0; i < numSamples; i++) {
+        residual = residuals[0][i];
+        residualsMap[0][residual]++;
+    }
+    for(int i = 0; i < numSamples; i++) {
+        residual = residuals[1][i];
+        residualsMap[1][residual]++;
+    }
+
+    //calculate probability of each amplitude for each channel
+    std::vector<std::map<int,float>> samplesProb;
+    samplesProb.resize(2);
+    for(int i = 0; i < 2; i++) 
+    {
+        for(auto itr = residualsMap[i].begin(); itr != residualsMap[i].end(); itr++)
+        {
+            samplesProb[i][(*itr).first] = (*itr).second / (float) numSamples;
+        }
+    }
+
+    //calculate entropy for each channel
+    std::vector<double> entropies;
+    entropies.resize(2);
+    for(int i = 0; i < 2; i++) 
+    {   
+        for(auto itr = samplesProb[i].begin(); itr != samplesProb[i].end(); itr++)
+        {
+            if( (*itr).second != 0)
+                entropies[i] += - (*itr).second * log2((*itr).second);
+        }
+    }
+
+    writeMatlabVectorFiles(residualsMap);
+    return entropies;
+}
 
 std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth) {
     int maxValue = std::pow(2, bitDepth);
@@ -113,7 +190,7 @@ void redundancyDecoder(char * filePath){
 }
  */
 
-std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
+std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
     Golomb golomb(encoderOuputFile, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -121,8 +198,10 @@ std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
     std::vector<int> left = convertChannelAmplitudeToInteger(audioFile.samples[0], bitDepth);
     std::vector<int> right = convertChannelAmplitudeToInteger(audioFile.samples[1], bitDepth);
 
-    std::vector<int> encodedResiduals;
-    encodedResiduals.resize(numSamples*2);
+    std::vector<std::vector<int>> encodedResiduals;
+    encodedResiduals.resize(2);
+    encodedResiduals[0].resize(numSamples*2);
+    encodedResiduals[1].resize(numSamples*2);
 
     int m = golomb.getOtimizedM(left);
     golomb.encodeNumber(m);
@@ -133,7 +212,7 @@ std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
     int r, previous = 0;
     for(int i = 0; i < numSamples; i++) {
         r = left[i] - previous;
-        encodedResiduals[i] = r;
+        encodedResiduals[0][i] = r;
 
         golomb.encodeNumber(r);
         previous = left[i];
@@ -141,7 +220,7 @@ std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
 
     for(int i = 0; i < numSamples; i++) {
         r = right[i] - previous;
-        encodedResiduals[i+numSamples] = r;
+        encodedResiduals[1][i] = r;
 
         golomb.encodeNumber(r);
         previous = right[i];
@@ -207,9 +286,18 @@ int main(int argc, char * argv[]){
     AudioFile<double> audioFile;
     audioFile.load(argv[1]);
 
+
     std::string filePath = argv[1];
-    firstOrderPredictorEncoder(audioFile);
+    std::vector<std::vector<int>> encodedResiduals = firstOrderPredictorEncoder(audioFile);
     firstOrderPredictorDecoder(encoderOuputFile);
+    
+    std::vector<double> entropies;
+    entropies = calculateEntropyAndResidualHistograms(encodedResiduals, audioFile.getBitDepth());
+
+    for(int i = 0; i < 2; i++)
+    {
+        std::cout << entropies[i] << std::endl;
+    }
 
     return 0;
 }
