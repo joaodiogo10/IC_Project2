@@ -10,6 +10,7 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void writeMatlabVectorFiles(map<int, int> &mapY, map<int, int> &mapU, map<int, int> &mapV);
 
 //./encoder image textFile m
 int main(int argc, char *argv[])
@@ -125,6 +126,104 @@ int main(int argc, char *argv[])
     imwrite("UReduced.jpeg", UComponentReduced);
     imwrite("VReduced.jpeg", VComponentReduced);
 
+    map<int, int> mapY, mapU, mapV;
+    int totalY = 0, totalU = 0, totalV = 0;
+    int countY = 0, countU = 0, countV = 0;
+
+    //Frequency counting for residuals
+    for (int i = -255; i < 256; i++)
+    {
+        countY = 0;
+        countU = 0;
+        countV = 0;
+        for (int k = 0; k < YPredictor.rows; k++)
+        {
+            pYPred = YPredictor.ptr<short>(k);
+            for (int j = 0; j < YPredictor.cols; j++)
+            {
+                if (pYPred[j] == i)
+                {
+                    countY++;
+                    totalY++;
+                }
+            }
+        }
+
+        for (int k = 0; k < UReducedPredictor.rows; k++)
+        {
+            pUPred = UReducedPredictor.ptr<short>(k);
+            pVPred = VReducedPredictor.ptr<short>(k);
+            for (int j = 0; j < UReducedPredictor.cols; j++)
+            {
+                if (pUPred[j] == i)
+                {
+                    countU++;
+                    totalU++;
+                }
+
+                if (pVPred[j] == i)
+                {
+                    countV++;
+                    totalV++;
+                }
+            }
+        }
+
+        mapY[i] = countY;
+        mapU[i] = countU;
+        mapV[i] = countV;
+    }
+
+    float entropyY, entropyU, entropyV;
+    map<int, float> probMapY, probMapU, probMapV;
+    float totalBlue = 0, totalGreen = 0, totalRed = 0;
+
+    for (int i = -255; i < 256; i++)
+    {
+        probMapY[i] = mapY[i] / (float)totalY;
+        probMapU[i] = mapU[i] / (float)totalU;
+        probMapV[i] = mapV[i] / (float)totalV;
+
+        if (probMapY[i] != 0)
+        {
+            entropyY += probMapY[i] * log2(probMapY[i]);
+        }
+
+        if (probMapU[i] != 0)
+        {
+            entropyU += probMapU[i] * log2(probMapU[i]);
+        }
+
+        if (probMapV[i] != 0)
+        {
+            entropyV += probMapV[i] * log2(probMapV[i]);
+        }
+
+        totalBlue += probMapY[i];
+        totalGreen += probMapU[i];
+        totalRed += probMapV[i];
+    }
+
+    std::cout << "Y prob total"
+              << ": " << totalBlue << '\n';
+
+    std::cout << "U prob total"
+              << ": " << totalGreen << '\n';
+
+    std::cout << "V prob total"
+              << ": " << totalRed << '\n';
+
+    std::cout << "Y entropy"
+              << ": " << -entropyY << '\n';
+
+    std::cout << "U entropy"
+              << ": " << -entropyU << '\n';
+
+    std::cout << "V entropy"
+              << ": " << -entropyV << '\n';
+
+    writeMatlabVectorFiles(mapY, mapU, mapV);
+
     return 0;
 }
 
@@ -220,11 +319,11 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     }
 }
 
-uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
     uint32_t m = 0;
     std::vector<int> values;
-    uint32_t size = YPredictor.rows * YPredictor.cols + UReducedPredictor.rows \
-                  * UReducedPredictor.cols + VReducedPredictor.rows * VReducedPredictor.cols; 
+    uint32_t size = YPredictor.rows * YPredictor.cols + UReducedPredictor.rows * UReducedPredictor.cols + VReducedPredictor.rows * VReducedPredictor.cols;
 
     values.resize(size);
     uint32_t valuesCount = 0;
@@ -252,7 +351,7 @@ uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &V
             valuesCount++;
         }
     }
-    
+
     //encode V
     short *pVPred;
     for (int i = 0; i < VReducedPredictor.rows; i++)
@@ -268,4 +367,24 @@ uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &V
     m = Golomb::getOtimizedM(values);
 
     return m;
+}
+
+void writeMatlabVectorFiles(map<int, int> &mapY, map<int, int> &mapU, map<int, int> &mapV)
+{
+    std::ofstream xAxisFile("../matlab/xAxis.txt");
+    std::ofstream YFrequenceFile("../matlab/YFrequence.txt");
+    std::ofstream UFrequenceFile("../matlab/UFrequence.txt");
+    std::ofstream VFrequenceFile("../matlab/VFrequence.txt");
+
+    for (int i = -255; i < 256; i++)
+    {
+        xAxisFile << i << std::endl;
+        YFrequenceFile << mapY[i] << std::endl;
+        UFrequenceFile << mapU[i] << std::endl;
+        VFrequenceFile << mapV[i] << std::endl;
+    }
+
+    YFrequenceFile.close();
+    UFrequenceFile.close();
+    VFrequenceFile.close();
 }
