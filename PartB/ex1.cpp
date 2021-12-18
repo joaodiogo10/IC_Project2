@@ -28,7 +28,6 @@ std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channe
     return  doubleChannel;
 }
 
-
 /* void redundancy(AudioFile<double> audioFile){
     Golomb golomb("encoded", BitStream::bs_mode::write, m);
 
@@ -114,13 +113,16 @@ void redundancyDecoder(char * filePath){
 }
  */
 
-void firstOrderPredictorEncoder(AudioFile<double> audioFile) {
+std::vector<int> firstOrderPredictorEncoder(AudioFile<double> audioFile) {
     Golomb golomb(encoderOuputFile, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
     int bitDepth = audioFile.getBitDepth();
     std::vector<int> left = convertChannelAmplitudeToInteger(audioFile.samples[0], bitDepth);
     std::vector<int> right = convertChannelAmplitudeToInteger(audioFile.samples[1], bitDepth);
+
+    std::vector<int> encodedResiduals;
+    encodedResiduals.resize(numSamples*2);
 
     int m = golomb.getOtimizedM(left);
     golomb.encodeNumber(m);
@@ -129,16 +131,23 @@ void firstOrderPredictorEncoder(AudioFile<double> audioFile) {
 
     golomb.setM(m);
     int r, previous = 0;
-    for(int i = 0; i < numSamples; i++){
+    for(int i = 0; i < numSamples; i++) {
         r = left[i] - previous;
+        encodedResiduals[i] = r;
+
         golomb.encodeNumber(r);
         previous = left[i];
     }
-    for(int i = 0; i < numSamples; i++){
+
+    for(int i = 0; i < numSamples; i++) {
         r = right[i] - previous;
+        encodedResiduals[i+numSamples] = r;
+
         golomb.encodeNumber(r);
         previous = right[i];
     }
+
+    return encodedResiduals;
 } 
 
 void firstOrderPredictorDecoder(std::string filepath) {
@@ -156,7 +165,7 @@ void firstOrderPredictorDecoder(std::string filepath) {
     std::vector<int> right;
     right.resize(numSamples);
 
-    int r, previous;
+    int r, previous = 0;
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber();
         left[i] = r + previous;
