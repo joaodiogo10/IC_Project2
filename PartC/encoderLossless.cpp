@@ -10,7 +10,7 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
-void writeMatlabVectorFiles(map<int, int> &mapY, map<int, int> &mapU, map<int, int> &mapV);
+void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV);
 
 //./encoder image textFile
 int main(int argc, char *argv[])
@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
     imwrite("UReduced.jpeg", UComponentReduced);
     imwrite("VReduced.jpeg", VComponentReduced);
 
-    map<int, int> mapY, mapU, mapV;
-    int totalY = 0, totalU = 0, totalV = 0;
+    map<int, double> mapY, mapU, mapV;
+    double totalY = 0, totalU = 0, totalV = 0;
     int countY = 0, countU = 0, countV = 0;
 
     //Frequency counting for residuals
@@ -173,15 +173,17 @@ int main(int argc, char *argv[])
         mapV[i] = countV;
     }
 
-    float entropyY, entropyU, entropyV;
-    map<int, float> probMapY, probMapU, probMapV;
-    float totalBlue = 0, totalGreen = 0, totalRed = 0;
+    double entropyY, entropyU, entropyV;
+    map<int, double> probMapY, probMapU, probMapV;
+    double totalBlue = 0, totalGreen = 0, totalRed = 0;
 
     for (int i = -255; i < 256; i++)
     {
-        probMapY[i] = mapY[i] / (float)totalY;
-        probMapU[i] = mapU[i] / (float)totalU;
-        probMapV[i] = mapV[i] / (float)totalV;
+        probMapY[i] = mapY[i] / totalY;
+        probMapU[i] = mapU[i] / totalU;
+        probMapV[i] = mapV[i] / totalV;
+
+        cout << "prob map Y: " << probMapY[i] << endl;
 
         if (probMapY[i] != 0)
         {
@@ -368,7 +370,7 @@ uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &V
     return m;
 }
 
-void writeMatlabVectorFiles(map<int, int> &mapY, map<int, int> &mapU, map<int, int> &mapV)
+void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
 {
     std::ofstream xAxisFile("../matlab/xAxis.txt");
     std::ofstream YFrequenceFile("../matlab/YFrequence.txt");
