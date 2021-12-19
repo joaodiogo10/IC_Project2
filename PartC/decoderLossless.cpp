@@ -175,11 +175,11 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
 {
     //reverse Predictor for Y
     //first row, Predictor = 0
-    uint16_t rowLength = YComponent.rows;
-    uint16_t colLength = YComponent.cols;
+    int rowLength = YComponent.rows;
+    int colLength = YComponent.cols;
     for (int i = 0; i < rowLength; i++)
     {
-        YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<uchar>(0)[i];
+        YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<short>(0)[i];
     }
 
     //Remaining rows, Predictor = b
@@ -187,19 +187,19 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     {
         for (int j = 0; j < colLength; j++)
         {
-            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i - 1)[j];
+            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<short>(i)[j] + YComponent.ptr<uchar>(i - 1)[j];
         }
     }
 
     //reverse Predictor for U and V
     //first row, Predictor = 0
-    uint16_t rowLength = UComponentReduced.rows;
-    uint16_t colLength = UComponentReduced.cols;
+    rowLength = UComponentReduced.rows;
+    colLength = UComponentReduced.cols;
 
     for (int i = 0; i < rowLength; i++)
     {
-        UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<uchar>(0)[i];
-        VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<uchar>(0)[i];
+        UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<short>(0)[i];
+        VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<short>(0)[i];
     }
 
     //Remaining rows, Predictor = b
@@ -207,8 +207,8 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     {
         for (int j = 0; j < colLength; j++)
         {
-            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j];
-            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<short>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j];
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<short>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j];
         }
     }
 }
@@ -217,47 +217,47 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
 {
     //reverse Predictor for Y
     //first row, Predictor = 0
-    uint16_t rowLength = YComponent.rows;
-    uint16_t colLength = YComponent.cols;
+    int rowLength = YComponent.rows;
+    int colLength = YComponent.cols;
     for (int i = 0; i < rowLength; i++)
     {
-        YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<uchar>(0)[i];
+        YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<short>(0)[i];
     }
 
     for (int i = 1; i < rowLength; i++)
     {
         //first column predictor = 0
-        YComponent.ptr<uchar>(i)[0] = YPredictor.ptr<uchar>(i)[0];
+        YComponent.ptr<uchar>(i)[0] = YPredictor.ptr<short>(i)[0];
 
         //Remaining columns, Predictor = c
         for (int j = 1; j < colLength; j++)
         {
-            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i - 1)[j - 1];
+            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<short>(i)[j] + YComponent.ptr<uchar>(i - 1)[j - 1];
         }
     }
 
     //reverse Predictor for U and V
     //first row, Predictor = 0
-    uint16_t rowLength = UComponentReduced.rows;
-    uint16_t colLength = UComponentReduced.cols;
+    rowLength = UComponentReduced.rows;
+    colLength = UComponentReduced.cols;
 
     for (int i = 0; i < rowLength; i++)
     {
-        UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<uchar>(0)[i];
-        VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<uchar>(0)[i];
+        UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<short>(0)[i];
+        VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<short>(0)[i];
     }
 
     for (int i = 1; i < rowLength; i++)
     {
         //first column predictor = 0
-        UComponentReduced.ptr<uchar>(i)[0] = UReducedPredictor.ptr<uchar>(i)[0];
-        VComponentReduced.ptr<uchar>(i)[0] = VReducedPredictor.ptr<uchar>(i)[0];
+        UComponentReduced.ptr<uchar>(i)[0] = UReducedPredictor.ptr<short>(i)[0];
+        VComponentReduced.ptr<uchar>(i)[0] = VReducedPredictor.ptr<short>(i)[0];
 
         //Remaining columns, Predictor = c
         for (int j = 0; j < colLength; j++)
         {
-            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j - 1];
-            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<short>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<short>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j - 1];
         }
     }
 }
