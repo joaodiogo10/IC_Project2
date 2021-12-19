@@ -206,13 +206,6 @@ int main(int argc, char *argv[])
 
     encoder.close();
 
-    imwrite("Y.jpeg", YComponent);
-    imwrite("U.jpeg", UComponent);
-    imwrite("V.jpeg", VComponent);
-
-    imwrite("UReduced.jpeg", UComponentReduced);
-    imwrite("VReduced.jpeg", VComponentReduced);
-
     map<int, double> mapY, mapU, mapV;
     double totalY = 0, totalU = 0, totalV = 0;
     int countY = 0, countU = 0, countV = 0;
@@ -263,7 +256,7 @@ int main(int argc, char *argv[])
 
     double entropyY, entropyU, entropyV;
     map<int, double> probMapY, probMapU, probMapV;
-    double totalBlue = 0, totalGreen = 0, totalRed = 0;
+    double totalYProb = 0, totalUProb = 0, totalVProb = 0;
 
     for (int i = -255; i < 256; i++)
     {
@@ -288,19 +281,19 @@ int main(int argc, char *argv[])
             entropyV += probMapV[i] * log2(probMapV[i]);
         }
 
-        totalBlue += probMapY[i];
-        totalGreen += probMapU[i];
-        totalRed += probMapV[i];
+        totalYProb += probMapY[i];
+        totalUProb += probMapU[i];
+        totalVProb += probMapV[i];
     }
 
-    std::cout << "Y prob total"
-              << ": " << totalBlue << '\n';
+    // std::cout << "Y prob total"
+    //           << ": " << totalYProb << '\n';
 
-    std::cout << "U prob total"
-              << ": " << totalGreen << '\n';
+    // std::cout << "U prob total"
+    //           << ": " << totalUProb << '\n';
 
-    std::cout << "V prob total"
-              << ": " << totalRed << '\n';
+    // std::cout << "V prob total"
+    //           << ": " << totalVProb << '\n';
 
     std::cout << "Y entropy"
               << ": " << -entropyY << '\n';
@@ -312,6 +305,13 @@ int main(int argc, char *argv[])
               << ": " << -entropyV << '\n';
 
     writeMatlabVectorFiles(mapY, mapU, mapV);
+
+    imwrite("Y.jpeg", YComponent);
+    imwrite("U.jpeg", UComponent);
+    imwrite("V.jpeg", VComponent);
+
+    imwrite("UReduced.jpeg", UComponentReduced);
+    imwrite("VReduced.jpeg", VComponentReduced);
 
     return 0;
 }
