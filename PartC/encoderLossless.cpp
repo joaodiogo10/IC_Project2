@@ -61,8 +61,23 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 * \param[out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
 */
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+
+/**
+* \brief Fazer para esta.
+* 
+*/
 void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
+/**
+* \brief Fazer para esta.
+* 
+*/
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+
+/**
+* \brief Fazer para esta.
+* 
+*/
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 /**
@@ -393,13 +408,15 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     }
 }
 
-void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
     //Predictor for Y
-    
+
     //first row, Predictor = 0
     uint16_t rowLength = YComponent.rows;
     uint16_t colLength = YComponent.cols;
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         YPredictor.ptr<uchar>(0)[i] = YComponent.ptr<uchar>(0)[i];
     }
     //Remaining rows, Predictor = b
@@ -407,7 +424,7 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     {
         for (int j = 0; j < colLength; j++)
         {
-            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i-1)[j];
+            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j];
         }
     }
 
@@ -416,7 +433,8 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     uint16_t rowLength = UComponentReduced.rows;
     uint16_t colLength = UComponentReduced.cols;
 
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         UReducedPredictor.ptr<uchar>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
         VReducedPredictor.ptr<uchar>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
     }
@@ -426,18 +444,20 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     {
         for (int j = 0; j < colLength; j++)
         {
-            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i-1)[j];
-            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i-1)[j];
+            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j];
+            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j];
         }
     }
 }
 
-void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
     //Predictor for Y
     //first row, Predictor = 0
     uint16_t rowLength = YComponent.rows;
     uint16_t colLength = YComponent.cols;
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         YPredictor.ptr<uchar>(0)[i] = YComponent.ptr<uchar>(0)[i];
     }
 
@@ -449,7 +469,7 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
         //Remaining columns, Predictor = c
         for (int j = 1; j < colLength; j++)
         {
-            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i-1)[j-1];
+            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j - 1];
         }
     }
 
@@ -458,7 +478,8 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     uint16_t rowLength = UComponentReduced.rows;
     uint16_t colLength = UComponentReduced.cols;
 
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         UReducedPredictor.ptr<uchar>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
         VReducedPredictor.ptr<uchar>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
     }
@@ -472,8 +493,8 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
         //Remaining columns, Predictor = c
         for (int j = 0; j < colLength; j++)
         {
-            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i-1)[j-1];
-            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i-1)[j-1];
+            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j - 1];
         }
     }
 }
@@ -531,19 +552,19 @@ uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &V
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
 {
     std::ofstream xAxisFile("../matlab/xAxis.txt");
-    std::ofstream YFrequenceFile("../matlab/YFrequence.txt");
-    std::ofstream UFrequenceFile("../matlab/UFrequence.txt");
-    std::ofstream VFrequenceFile("../matlab/VFrequence.txt");
+    std::ofstream YFrequencyFile("../matlab/YFrequency.txt");
+    std::ofstream UFrequencyFile("../matlab/UFrequency.txt");
+    std::ofstream VFrequencyFile("../matlab/VFrequency.txt");
 
     for (int i = -255; i < 256; i++)
     {
         xAxisFile << i << std::endl;
-        YFrequenceFile << mapY[i] << std::endl;
-        UFrequenceFile << mapU[i] << std::endl;
-        VFrequenceFile << mapV[i] << std::endl;
+        YFrequencyFile << mapY[i] << std::endl;
+        UFrequencyFile << mapU[i] << std::endl;
+        VFrequencyFile << mapV[i] << std::endl;
     }
 
-    YFrequenceFile.close();
-    UFrequenceFile.close();
-    VFrequenceFile.close();
+    YFrequencyFile.close();
+    UFrequencyFile.close();
+    VFrequencyFile.close();
 }
