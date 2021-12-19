@@ -6,7 +6,7 @@
 using namespace std;
 using namespace cv;
 
-void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 //./decoder textFile
 int main(int argc, char *argv[])
@@ -47,51 +47,51 @@ int main(int argc, char *argv[])
     decoder.setM(m);
 
     //Matrices for predictor values
-    cv::Mat YPredictor = cv::Mat::zeros(rows, cols, CV_32SC1);
-    cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
-    cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    cv::Mat YResiduals = cv::Mat::zeros(rows, cols, CV_32SC1);
+    cv::Mat UReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    cv::Mat VReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
     //Acho q esta a dar overflow nos shifts ns, apartir de 8 de reduçao é irreconhecivel
 
     //decode Y
-    short *pYPred;
-    for (int i = 0; i < YPredictor.rows; i++)
+    short *pYRes;
+    for (int i = 0; i < YResiduals.rows; i++)
     {
-        pYPred = YPredictor.ptr<short>(i);
-        pYPred[0] = decoder.decodeNumber();
+        pYRes = YResiduals.ptr<short>(i);
+        pYRes[0] = decoder.decodeNumber();
 
-        for (int j = 1; j < YPredictor.cols; j++)
+        for (int j = 1; j < YResiduals.cols; j++)
         {
-            pYPred[j] = decoder.decodeNumber();
-            pYPred[j] = pYPred[j] << reduceY;
+            pYRes[j] = decoder.decodeNumber();
+            pYRes[j] = pYRes[j] << reduceY;
         }
     }
 
     //decode U
-    short *pUPred;
-    for (int i = 0; i < UReducedPredictor.rows; i++)
+    short *pURes;
+    for (int i = 0; i < UReducedResiduals.rows; i++)
     {
-        pUPred = UReducedPredictor.ptr<short>(i);
-        pUPred[0] = decoder.decodeNumber();
+        pURes = UReducedResiduals.ptr<short>(i);
+        pURes[0] = decoder.decodeNumber();
 
-        for (int j = 1; j < UReducedPredictor.cols; j++)
+        for (int j = 1; j < UReducedResiduals.cols; j++)
         {
-            pUPred[j] = decoder.decodeNumber();
-            pUPred[j] = pUPred[j] << reduceU;
+            pURes[j] = decoder.decodeNumber();
+            pURes[j] = pURes[j] << reduceU;
         }
     }
 
     //decode V
-    short *pVPred;
-    for (int i = 0; i < VReducedPredictor.rows; i++)
+    short *pVRes;
+    for (int i = 0; i < VReducedResiduals.rows; i++)
     {
-        pVPred = VReducedPredictor.ptr<short>(i);
-        pVPred[0] = decoder.decodeNumber();
+        pVRes = VReducedResiduals.ptr<short>(i);
+        pVRes[0] = decoder.decodeNumber();
 
-        for (int j = 1; j < VReducedPredictor.cols; j++)
+        for (int j = 1; j < VReducedResiduals.cols; j++)
         {
-            pVPred[j] = decoder.decodeNumber();
-            pVPred[j] = pVPred[j] << reduceV;
+            pVRes[j] = decoder.decodeNumber();
+            pVRes[j] = pVRes[j] << reduceV;
         }
     }
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
     cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
 
-    reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
+    reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
 
     imwrite("YDecoded.jpeg", YComponent);
 
@@ -111,21 +111,21 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
 
     uchar *pY, *pU, *pV;
-    short *pYPred, *pUPred, *pVPred;
+    short *pYRes, *pURes, *pVRes;
 
     //Reverse predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
         pY = YComponent.ptr<uchar>(i);
-        pYPred = YPredictor.ptr<short>(i);
-        pY[0] = pYPred[0];
+        pYRes = YResiduals.ptr<short>(i);
+        pY[0] = pYRes[0];
         for (int j = 1; j < YComponent.cols; j++)
         {
-            pY[j] = pYPred[j] + pY[j - 1];
+            pY[j] = pYRes[j] + pY[j - 1];
         }
     }
 
@@ -133,16 +133,16 @@ void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     for (int i = 0; i < UComponentReduced.rows; i++)
     {
         pU = UComponentReduced.ptr<uchar>(i);
-        pUPred = UReducedPredictor.ptr<short>(i);
+        pURes = UReducedResiduals.ptr<short>(i);
         pV = VComponentReduced.ptr<uchar>(i);
-        pVPred = VReducedPredictor.ptr<short>(i);
-        pU[0] = pUPred[0];
-        pV[0] = pVPred[0];
+        pVRes = VReducedResiduals.ptr<short>(i);
+        pU[0] = pURes[0];
+        pV[0] = pVRes[0];
         for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pU[j] = pUPred[j] + pU[j - 1];
+            pU[j] = pURes[j] + pU[j - 1];
 
-            pV[j] = pVPred[j] + pV[j - 1];
+            pV[j] = pVRes[j] + pV[j - 1];
         }
     }
 }
