@@ -102,8 +102,6 @@ int main(int argc, char *argv[])
 
     predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor, encoder, reduceY, reduceU, reduceV);
 
-    //tenho de fzr fillWithPadding ???
-
     encoder.close();
 
     return 0;

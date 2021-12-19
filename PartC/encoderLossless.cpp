@@ -6,15 +6,94 @@
 using namespace std;
 using namespace cv;
 
+/** \file 
+ *  Lossless encoder. \n
+ *  Image transformations are saved in files. \n
+ *  Frequency of residuals are written in files, under matlab/lossless/ImageName. \n
+ *  File with the encoded information is written under results. \n
+*/
+
+/**
+* \brief Converts RGB to YUV.
+* 
+* For each pixel of the source image, that is each position of the Mat where values for R, G and B are stored, it applies the following conversion: \n
+* Y = 0.299 * B + 0.587 * G + 0.114 * R \n
+* U = 128 - 0.168736 * B - 0.331264 * G + 0.5 * R \n
+* V = 128 + 0.5 * B - 0.418688 * G - 0.081312 * R \n
+* \n
+* Each value is saved in the respective Mat.
+* 
+* \param[in] source \ref cv::Mat of the source RGB image.
+* \param[out] YComponent \ref cv::Mat to store the values of Y.
+* \param[out] UComponent \ref cv::Mat to store the values of U.
+* \param[out] VComponent \ref cv::Mat to store the values of V.
+*/
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
+
+/**
+* \brief Reduces YUV to YUV 4:2:0.
+* 
+* Removes odd rows and columns of the \p UComponent and \p VComponent chrominance components, producing a reduction in the data rate. \n
+* \n
+* Each value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponent \ref cv::Mat with the values of U.
+* \param[in] VComponent \ref cv::Mat with the values of V.
+* \param[out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
+*/
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
+
+/**
+* \brief First of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
+* 
+* It subtracts the previous pixel intensity to the current one. \n
+* In the case of the first column it considers the previous value to be zero. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[out] YPredictor \ref cv::Mat to store the residuals of the Y component.
+* \param[out] UReducedPredictor \ref cv::Mat to store the residuals of the U component.
+* \param[out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
+*/
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+<<<<<<< HEAD
 void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
+=======
+
+/**
+* \brief Fazer para esta.
+* 
+*/
+>>>>>>> 85e060af8e309b90e1827c82753733307d4ee412
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+
+/**
+* \brief Method to save the frequency ot the residual values of the components in files to further calculate the histograms.
+* 
+* It saves a file with the values to the xAxis, from -255 to 255, named xAxis.txt. \n
+* For each map, it saves a file with all the frequencies of the values between -255 and 255. \n
+* Namely YFrequence.txt, UFrequence.txt and VFrequence.txt. \n
+* 
+* \param[in] mapY \ref cv::Mat with the frequency of the residual values of Y.
+* \param[in] mapU \ref cv::Mat with the frequency of the residual values of the sub-sample of U.
+* \param[in] mapV \ref cv::Mat with the frequency of the residual values of the sub-sample of V.
+*/
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV);
 
-//./encoder image textFile
+/**
+* \brief Main method of the lossless encoder.
+* 
+* Usage: ./encoderLossless ImageName TextFile \n
+*
+* \param[in] ImageName \ref Image to process.
+* \param[in] TextFile \ref Name of the file to save the encoded image.
+*/
 int main(int argc, char *argv[])
 {
     if (argc < 3)
@@ -67,8 +146,8 @@ int main(int argc, char *argv[])
 
     uint32_t m;
 
-    //Encode Header with fixed m = 200
-    Golomb encoder((string)argv[2], BitStream::bs_mode::write, 200);
+    //Encode Header with fixed m = 400
+    Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
 
     m = getOptimalM(YPredictor, UReducedPredictor, VReducedPredictor);
     std::cout << "Optimal m: " << m << std::endl;
@@ -185,7 +264,7 @@ int main(int argc, char *argv[])
         probMapU[i] = mapU[i] / totalU;
         probMapV[i] = mapV[i] / totalV;
 
-        cout << "prob map Y: " << probMapY[i] << endl;
+        //cout << "prob map Y: " << probMapY[i] << endl;
 
         if (probMapY[i] != 0)
         {
