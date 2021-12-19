@@ -44,7 +44,7 @@ const std::tuple<EncoderFunction,DecoderFunction> codecArray[] =
 
 int main(int argc, char *argv[]){
     if (argc < 4 || std::atoi(argv[2]) > 2 || std::atoi(argv[2]) < 0) {
-        std::cout << "Usage: ./codecLossless <AudioFilePath> <CodecNumber> <OutputFilePath>" << std::endl;
+        std::cout << "Usage: ./codecLossless <AudioFilePath> <CodecNumber> <OutputFile>" << std::endl;
         std::cout << "--------------------------------------------" << std::endl;
         std::cout << "AudioFilePath: input audio file" << std::endl;
         std::cout << "CodecNumber: target codec number" << std::endl;
