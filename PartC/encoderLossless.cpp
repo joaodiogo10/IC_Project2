@@ -61,11 +61,16 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 * \param[out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
 */
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+<<<<<<< HEAD
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+
+=======
 
 /**
 * \brief Fazer para esta.
 * 
 */
+>>>>>>> 85e060af8e309b90e1827c82753733307d4ee412
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 /**
@@ -392,6 +397,91 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
             pUPred[j] = pU[j] - pU[j - 1];
 
             pVPred[j] = pV[j] - pV[j - 1];
+        }
+    }
+}
+
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+    //Predictor for Y
+    
+    //first row, Predictor = 0
+    uint16_t rowLength = YComponent.rows;
+    uint16_t colLength = YComponent.cols;
+    for(int i = 0; i < rowLength; i++) {
+        YPredictor.ptr<uchar>(0)[i] = YComponent.ptr<uchar>(0)[i];
+    }
+    //Remaining rows, Predictor = b
+    for (int i = 1; i < rowLength; i++)
+    {
+        for (int j = 0; j < colLength; j++)
+        {
+            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i-1)[j];
+        }
+    }
+
+    //Predictor for U and V
+    //first row, Predictor = 0
+    uint16_t rowLength = UComponentReduced.rows;
+    uint16_t colLength = UComponentReduced.cols;
+
+    for(int i = 0; i < rowLength; i++) {
+        UReducedPredictor.ptr<uchar>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedPredictor.ptr<uchar>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+    }
+
+    //Remaining rows, Predictor = b
+    for (int i = 1; i < rowLength; i++)
+    {
+        for (int j = 0; j < colLength; j++)
+        {
+            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i-1)[j];
+            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i-1)[j];
+        }
+    }
+}
+
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+    //Predictor for Y
+    //first row, Predictor = 0
+    uint16_t rowLength = YComponent.rows;
+    uint16_t colLength = YComponent.cols;
+    for(int i = 0; i < rowLength; i++) {
+        YPredictor.ptr<uchar>(0)[i] = YComponent.ptr<uchar>(0)[i];
+    }
+
+    for (int i = 1; i < rowLength; i++)
+    {
+        //first column predictor = 0
+        YPredictor.ptr<uchar>(i)[0] = YComponent.ptr<uchar>(i)[0];
+
+        //Remaining columns, Predictor = c
+        for (int j = 1; j < colLength; j++)
+        {
+            YPredictor.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i-1)[j-1];
+        }
+    }
+
+    //Predictor for U and V
+    //first row, Predictor = 0
+    uint16_t rowLength = UComponentReduced.rows;
+    uint16_t colLength = UComponentReduced.cols;
+
+    for(int i = 0; i < rowLength; i++) {
+        UReducedPredictor.ptr<uchar>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedPredictor.ptr<uchar>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+    }
+
+    for (int i = 1; i < rowLength; i++)
+    {
+        //first column predictor = 0
+        UReducedPredictor.ptr<uchar>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
+        VReducedPredictor.ptr<uchar>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
+
+        //Remaining columns, Predictor = c
+        for (int j = 0; j < colLength; j++)
+        {
+            UReducedPredictor.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i-1)[j-1];
+            VReducedPredictor.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i-1)[j-1];
         }
     }
 }
