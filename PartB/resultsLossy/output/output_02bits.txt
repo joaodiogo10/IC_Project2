@@ -1,0 +1,142 @@
+
+------sample01------
+
+../audioSamples/sample01.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 10.6542
+Channel 1 10.7942
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 10.1767
+Channel 1 11.0087
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 10.5998
+Channel 1 10.3948
+
+------sample02------
+
+../audioSamples/sample02.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 10.8875
+Channel 1 9.55738
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 11.1047
+Channel 1 10.0068
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 10.0926
+Channel 1 10.9837
+
+------sample03------
+
+../audioSamples/sample03.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 9.77276
+Channel 1 9.82253
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 9.58118
+Channel 1 9.31581
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 9.59662
+Channel 1 9.78292
+
+------sample04------
+
+../audioSamples/sample04.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 10.5737
+Channel 1 10.6839
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 8.85313
+Channel 1 8.84892
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 10.3847
+Channel 1 10.7363
+
+------sample05------
+
+../audioSamples/sample05.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 9.04432
+Channel 1 8.72559
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 7.82458
+Channel 1 7.70087
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 8.56498
+Channel 1 9.21682
+
+------sample06------
+
+../audioSamples/sample06.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 7.76999
+Channel 1 7.79608
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 5.10258
+Channel 1 5.0549
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 7.62237
+Channel 1 7.9001
+
+------sample07------
+
+../audioSamples/sample07.wav
+
+0- First Order Codec
+--------Entropy results:--------
+Channel 0 12.2661
+Channel 1 12.2571
+
+1- Polynomial Codec
+--------Entropy results:--------
+Channel 0 12.4519
+Channel 1 12.4996
+
+2- Redundancy Codec
+--------Entropy results:--------
+Channel 0 12.1597
+Channel 1 11.8401
+
+Mean entropy 0- First Order Codec
+10.04323928571428571428
+
+Mean entropy 1- Polynomial Codec
+9.25216928571428571428
+
+Mean entropy 2- Redundancy Codec
+9.99110785714285714285
