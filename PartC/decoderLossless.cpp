@@ -6,11 +6,6 @@
 using namespace std;
 using namespace cv;
 
-void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
-void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
-void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
-
-//./decoder textFile
 /** \file 
  *  Lossless decoder. \n
  *  Decoded images are saved in files. \n
@@ -32,6 +27,18 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
 * \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
 */
 void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
+
+/**
+* \brief Fazer para esta.
+* 
+*/
+void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+
+/**
+* \brief Fazer para esta.
+* 
+*/
+void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 /**
 * \brief Main method of the lossless decoder.
@@ -164,12 +171,14 @@ void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     }
 }
 
-void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
     //reverse Predictor for Y
     //first row, Predictor = 0
     uint16_t rowLength = YComponent.rows;
     uint16_t colLength = YComponent.cols;
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<uchar>(0)[i];
     }
 
@@ -178,7 +187,7 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     {
         for (int j = 0; j < colLength; j++)
         {
-            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i-1)[j];
+            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i - 1)[j];
         }
     }
 
@@ -187,7 +196,8 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     uint16_t rowLength = UComponentReduced.rows;
     uint16_t colLength = UComponentReduced.cols;
 
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<uchar>(0)[i];
         VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<uchar>(0)[i];
     }
@@ -197,18 +207,20 @@ void reversePredictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     {
         for (int j = 0; j < colLength; j++)
         {
-            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i-1)[j];
-            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i-1)[j];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j];
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j];
         }
     }
 }
 
-void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor) {
+void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+{
     //reverse Predictor for Y
     //first row, Predictor = 0
     uint16_t rowLength = YComponent.rows;
     uint16_t colLength = YComponent.cols;
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         YComponent.ptr<uchar>(0)[i] = YPredictor.ptr<uchar>(0)[i];
     }
 
@@ -220,7 +232,7 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
         //Remaining columns, Predictor = c
         for (int j = 1; j < colLength; j++)
         {
-            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i-1)[j-1];
+            YComponent.ptr<uchar>(i)[j] = YPredictor.ptr<uchar>(i)[j] + YComponent.ptr<uchar>(i - 1)[j - 1];
         }
     }
 
@@ -229,7 +241,8 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
     uint16_t rowLength = UComponentReduced.rows;
     uint16_t colLength = UComponentReduced.cols;
 
-    for(int i = 0; i < rowLength; i++) {
+    for (int i = 0; i < rowLength; i++)
+    {
         UComponentReduced.ptr<uchar>(0)[i] = UReducedPredictor.ptr<uchar>(0)[i];
         VComponentReduced.ptr<uchar>(0)[i] = VReducedPredictor.ptr<uchar>(0)[i];
     }
@@ -243,8 +256,8 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
         //Remaining columns, Predictor = c
         for (int j = 0; j < colLength; j++)
         {
-            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i-1)[j-1];
-            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i-1)[j-1];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedPredictor.ptr<uchar>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedPredictor.ptr<uchar>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j - 1];
         }
     }
 }
