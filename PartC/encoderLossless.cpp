@@ -61,16 +61,8 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 * \param[out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
 */
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
-<<<<<<< HEAD
 void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
-=======
-
-/**
-* \brief Fazer para esta.
-* 
-*/
->>>>>>> 85e060af8e309b90e1827c82753733307d4ee412
 uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
 /**
