@@ -18,13 +18,13 @@ function e = plotResult(dir,fig)
     fileAxis = fopen(dir + '/xAxis.txt','r');
     axis = fscanf(fileAxis,formatSpec);
 
-    fileY = fopen(dir + '/YFrequence.txt','r');
+    fileY = fopen(dir + '/YFrequency.txt','r');
     y = fscanf(fileY,formatSpec);
     
-    fileU = fopen(dir + '/UFrequence.txt','r');
+    fileU = fopen(dir + '/UFrequency.txt','r');
     u = fscanf(fileU,formatSpec);
     
-    fileV = fopen(dir + '/VFrequence.txt','r');
+    fileV = fopen(dir + '/VFrequency.txt','r');
     v = fscanf(fileV,formatSpec);
 
     figure(fig);

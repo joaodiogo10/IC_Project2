@@ -449,19 +449,19 @@ uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &V
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
 {
     std::ofstream xAxisFile("../matlab/xAxis.txt");
-    std::ofstream YFrequenceFile("../matlab/YFrequence.txt");
-    std::ofstream UFrequenceFile("../matlab/UFrequence.txt");
-    std::ofstream VFrequenceFile("../matlab/VFrequence.txt");
+    std::ofstream YFrequencyFile("../matlab/YFrequency.txt");
+    std::ofstream UFrequencyFile("../matlab/UFrequency.txt");
+    std::ofstream VFrequencyFile("../matlab/VFrequency.txt");
 
     for (int i = -255; i < 256; i++)
     {
         xAxisFile << i << std::endl;
-        YFrequenceFile << mapY[i] << std::endl;
-        UFrequenceFile << mapU[i] << std::endl;
-        VFrequenceFile << mapV[i] << std::endl;
+        YFrequencyFile << mapY[i] << std::endl;
+        UFrequencyFile << mapU[i] << std::endl;
+        VFrequencyFile << mapV[i] << std::endl;
     }
 
-    YFrequenceFile.close();
-    UFrequenceFile.close();
-    VFrequenceFile.close();
+    YFrequencyFile.close();
+    UFrequencyFile.close();
+    VFrequencyFile.close();
 }

@@ -21,8 +21,8 @@ do
 
 
     mv ../matlab/xAxis.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/YFrequence.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/UFrequence.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/VFrequence.txt ../matlab/lossless/${tmp}/
+    mv ../matlab/YFrequency.txt ../matlab/lossless/${tmp}/
+    mv ../matlab/UFrequency.txt ../matlab/lossless/${tmp}/
+    mv ../matlab/VFrequency.txt ../matlab/lossless/${tmp}/
 
 done
