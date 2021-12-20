@@ -28,12 +28,18 @@ using namespace cv;
 */
 void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
-//./decoder textFile
+/**
+* \brief Main method of the lossy decoder.
+* 
+* Usage: ./decoderLossy EncodedFile \n
+*
+* \param[in] EncodedFile \ref Name of the file to where the encoded image is saved.
+*/
 int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cout << "Usage: ./decoderLossy TextFile" << endl;
+        cout << "Usage: ./decoderLossy EncodedFile" << endl;
         return -1;
     }
 

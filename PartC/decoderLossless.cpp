@@ -43,15 +43,15 @@ void reversePredictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat 
 /**
 * \brief Main method of the lossless decoder.
 * 
-* Usage: ./decoderLossless TextFile \n
+* Usage: ./decoderLossless EncodedFile \n
 *
-* \param[in] TextFile \ref Name of the file to where the encoded image is saved.
+* \param[in] EncodedFile \ref Name of the file to where the encoded image is saved.
 */
 int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        cout << "Usage: ./decoderLossless TextFile" << endl;
+        cout << "Usage: ./decoderLossless EncodedFile" << endl;
         return -1;
     }
 

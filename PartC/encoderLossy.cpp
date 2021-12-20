@@ -47,12 +47,23 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor,
                 Golomb &encoder, int reduceY, int reduceU, int reduceV);
 
-//./encoder image textFile m numberToReduceY numberToReduceU numberToReduceV
+/**
+* \brief Main method of the lossy encoder.
+* 
+* Usage: ./encoderLossless ImageName EncodedFile m NumberToReduceY NumberToReduceU NumberToReduceV \n
+*
+* \param[in] ImageName \ref Image to process.
+* \param[in] EncodedFile \ref Name of the file to save the encoded image.
+* \param[in] m \ref m to the golomb codification.
+* \param[in] NumberToReduceY \ref Number os bits to reduce Y.
+* \param[in] NumberToReduceU \ref Number of bits to reduce U.
+* \param[in] NumberToReduceV \ref Number of bits to reduce V.
+*/
 int main(int argc, char *argv[])
 {
     if (argc < 7)
     {
-        cout << "Usage: ./encoderLossy ImageName TextFile m numberToReduceY numberToReduceU numberToReduceV" << endl;
+        cout << "Usage: ./encoderLossy ImageName EncodedFile m NumberToReduceY NumberToReduceU NumberToReduceV" << endl;
         return -1;
     }
 
