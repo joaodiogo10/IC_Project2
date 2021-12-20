@@ -20,9 +20,9 @@ function e = plotResult(name)
     xAxisCh2=(-length(channel2)/2+1):(length(channel2)/2);
     plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
     legend("Channel 1", "Channel 2")
-    xlabel("Amplitude");
+    xlabel("Residuais");
     grid on;
-    saveas(f, name + 'Matlab/FirstOrderCodec/' + name + '.png')
+    saveas(f, "../results/" + name + 'Results/FirstOrderCodec/' + name + '.png')
 
     formatSpec = '%d';
     fileChannel1 = fopen(name + 'Matlab/PolynomialCodec/channel1.txt','r');
@@ -36,9 +36,9 @@ function e = plotResult(name)
     xAxisCh2=(-length(channel2)/2+1):(length(channel2)/2);
     plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
     legend("Channel 1", "Channel 2")
-    xlabel("Amplitude");
+    xlabel("Residuais");
     grid on;
-    saveas(f,name + 'Matlab/PolynomialCodec/' + name + '.png')
+    saveas(f, "../results/" + name + 'Results/PolynomialCodec/' + name + '.png')
 
     fileChannel2= fopen(name + 'Matlab/RedundancyCodec/channel2.txt','r');
     channel2 = fscanf(fileChannel2,formatSpec);
@@ -48,7 +48,7 @@ function e = plotResult(name)
     xAxisCh2=(-length(channel2)/2+1):(length(channel2)/2);
     plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
     legend("Channel 1", "Channel 2")
-    xlabel("Amplitude");
+    xlabel("Residuais");
     grid on;
-    saveas(f,name + 'Matlab/RedundancyCodec/' + name + '.png')
+    saveas(f, "../results/" + name + 'Results/RedundancyCodec/' + name + '.png')
 end
