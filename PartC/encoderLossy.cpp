@@ -6,7 +6,43 @@
 using namespace std;
 using namespace cv;
 
+/** \file 
+ *  Lossy encoder. \n
+ *  Image transformations are saved in files. \n
+ *  Frequency of residuals are written in files, under matlab/lossy/ImageName. \n
+ *  File with the encoded information is written under results. \n
+*/
+
+/**
+* \brief Converts RGB to YUV.
+* 
+* For each pixel of the source image, that is each position of the Mat where values for R, G and B are stored, it applies the following conversion: \n
+* Y = 0.299 * B + 0.587 * G + 0.114 * R \n
+* U = 128 - 0.168736 * B - 0.331264 * G + 0.5 * R \n
+* V = 128 + 0.5 * B - 0.418688 * G - 0.081312 * R \n
+* \n
+* Each value is saved in the respective Mat.
+* 
+* \param[in] source \ref cv::Mat of the source RGB image.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponent \ref cv::Mat to store the values of U.
+* \param[in,out] VComponent \ref cv::Mat to store the values of V.
+*/
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
+
+/**
+* \brief Reduces YUV to YUV 4:2:0.
+* 
+* Removes odd rows and columns of the \p UComponent and \p VComponent chrominance components, producing a reduction in the data rate. \n
+* \n
+* Each value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponent \ref cv::Mat with the values of U.
+* \param[in] VComponent \ref cv::Mat with the values of V.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
+*/
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor,
                 Golomb &encoder, int reduceY, int reduceU, int reduceV);
@@ -94,11 +130,11 @@ int main(int argc, char *argv[])
     //Change encoder m
     encoder.setM(m);
 
-    imwrite("Y.jpeg", YComponent);
-    imwrite("U.jpeg", UComponent);
-    imwrite("V.jpeg", VComponent);
-    imwrite("UReduced.jpeg", UComponentReduced);
-    imwrite("VReduced.jpeg", VComponentReduced);
+    imwrite("Y.png", YComponent);
+    imwrite("U.png", UComponent);
+    imwrite("V.png", VComponent);
+    imwrite("UReduced.png", UComponentReduced);
+    imwrite("VReduced.png", VComponentReduced);
 
     predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor, encoder, reduceY, reduceU, reduceV);
 

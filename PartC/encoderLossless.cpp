@@ -24,9 +24,9 @@ using namespace cv;
 * Each value is saved in the respective Mat.
 * 
 * \param[in] source \ref cv::Mat of the source RGB image.
-* \param[out] YComponent \ref cv::Mat to store the values of Y.
-* \param[out] UComponent \ref cv::Mat to store the values of U.
-* \param[out] VComponent \ref cv::Mat to store the values of V.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponent \ref cv::Mat to store the values of U.
+* \param[in,out] VComponent \ref cv::Mat to store the values of V.
 */
 void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent);
 
@@ -40,8 +40,8 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 * \param[in] YComponent \ref cv::Mat with the values of Y.
 * \param[in] UComponent \ref cv::Mat with the values of U.
 * \param[in] VComponent \ref cv::Mat with the values of V.
-* \param[out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
-* \param[out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 
@@ -56,9 +56,9 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 * \param[in] YComponent \ref cv::Mat with the values of Y.
 * \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
 * \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
-* \param[out] YPredictor \ref cv::Mat to store the residuals of the Y component.
-* \param[out] UReducedPredictor \ref cv::Mat to store the residuals of the U component.
-* \param[out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
+* \param[in,out] YPredictor \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedPredictor \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
 */
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
 
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
         mapV[i] = countV;
     }
 
-    double entropyY, entropyU, entropyV;
+    double entropyY = 0, entropyU = 0, entropyV = 0;
     map<int, double> probMapY, probMapU, probMapV;
     double totalYProb = 0, totalUProb = 0, totalVProb = 0;
 
@@ -306,12 +306,12 @@ int main(int argc, char *argv[])
 
     writeMatlabVectorFiles(mapY, mapU, mapV);
 
-    imwrite("Y.jpeg", YComponent);
-    imwrite("U.jpeg", UComponent);
-    imwrite("V.jpeg", VComponent);
+    imwrite("Y.png", YComponent);
+    imwrite("U.png", UComponent);
+    imwrite("V.png", VComponent);
 
-    imwrite("UReduced.jpeg", UComponentReduced);
-    imwrite("VReduced.jpeg", VComponentReduced);
+    imwrite("UReduced.png", UComponentReduced);
+    imwrite("VReduced.png", VComponentReduced);
 
     return 0;
 }

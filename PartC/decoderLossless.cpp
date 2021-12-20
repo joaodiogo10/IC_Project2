@@ -19,9 +19,9 @@ using namespace cv;
 * \n
 * Each original value is saved in the respective Mat.
 * 
-* \param[out] YComponent \ref cv::Mat to store the values of Y.
-* \param[out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
-* \param[out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 * \param[in] YResiduals \ref cv::Mat with the residuals of the Y component.
 * \param[in] UReducedResiduals \ref cv::Mat with the residuals of the U component.
 * \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
@@ -127,10 +127,10 @@ int main(int argc, char *argv[])
 
     reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
 
-    imwrite("YDecoded.jpeg", YComponent);
+    imwrite("YDecoded.png", YComponent);
 
-    imwrite("UReducedDecoded.jpeg", UComponentReduced);
-    imwrite("VReducedDecoded.jpeg", VComponentReduced);
+    imwrite("UReducedDecoded.png", UComponentReduced);
+    imwrite("VReducedDecoded.png", VComponentReduced);
 
     return 0;
 }

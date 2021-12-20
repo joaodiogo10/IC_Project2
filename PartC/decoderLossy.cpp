@@ -6,6 +6,26 @@
 using namespace std;
 using namespace cv;
 
+/** \file 
+ *  Lossy decoder. \n
+ *  Decoded images are saved in files. \n
+*/
+
+/**
+* \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original value based on this mode.
+* 
+* It adds the previous pixel intensity to the current one. \n
+* In the case of the first column it considers the previous value to be zero. \n
+* \n
+* Each original value is saved in the respective Mat.
+* 
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
+* \param[in] YResiduals \ref cv::Mat with the residuals of the Y component.
+* \param[in] UReducedResiduals \ref cv::Mat with the residuals of the U component.
+* \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
+*/
 void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 //./decoder textFile
@@ -103,10 +123,10 @@ int main(int argc, char *argv[])
 
     reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
 
-    imwrite("YDecoded.jpeg", YComponent);
+    imwrite("YDecoded.png", YComponent);
 
-    imwrite("UReducedDecoded.jpeg", UComponentReduced);
-    imwrite("VReducedDecoded.jpeg", VComponentReduced);
+    imwrite("UReducedDecoded.png", UComponentReduced);
+    imwrite("VReducedDecoded.png", VComponentReduced);
 
     return 0;
 }
