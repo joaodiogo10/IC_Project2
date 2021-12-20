@@ -391,16 +391,16 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
     int r = 0;
     int Xn_1, Xn_2, Xn_3;
 
-    Xn_1 = left[0];
+    Xn_3 = left[0];
     r = 0 - left[0];
     encodedResiduals[0][0] = r;
     
     Xn_2 = left[1];
-    r = Xn_1 - left[1];
+    r = Xn_3 - left[1];
     encodedResiduals[0][1] = r;
 
-    r = (2*Xn_1 - Xn_2) - left[2];
-    Xn_3 = left[2];
+    r = (2*Xn_2 - Xn_3) - left[2];
+    Xn_1 = left[2];
     encodedResiduals[0][2] = r;
 
     for(int i = 3; i < numSamples; i++){
@@ -413,16 +413,16 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
         encodedResiduals[0][i] = r;
     }
 
-    Xn_1 = right[0];
+    Xn_3 = right[0];
     r = 0 - right[0];
     encodedResiduals[1][0] = r;
     
     Xn_2 = right[1];
-    r = Xn_1 - right[1];
+    r = Xn_3 - right[1];
     encodedResiduals[1][1] = r;
 
-    r = (2*Xn_1 - Xn_2) - right[2];
-    Xn_3 = right[2];
+    r = (2*Xn_2 - Xn_3) - right[2];
+    Xn_1 = right[2];
     encodedResiduals[1][2] = r;
 
     for(int i = 3; i < numSamples; i++){
@@ -472,15 +472,15 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
 
     r = decoder.decodeNumber();
     left[0] = r;
-    Xn_1 = left[0];
+    Xn_3 = left[0];
 
     r = decoder.decodeNumber();
-    left[1] = Xn_1 - r;
+    left[1] = Xn_3 - r;
     Xn_2 = left[1];
 
     r = decoder.decodeNumber();
-    left[2] = (2*Xn_1 - Xn_2) - r;
-    Xn_3 = left[2];
+    left[2] = (2*Xn_2 - Xn_3) - r;
+    Xn_1 = left[2];
 
     for(int i = 3; i < numSamples; i++){
         r = decoder.decodeNumber();
@@ -492,15 +492,15 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
 
     r = decoder.decodeNumber();
     right[0] = r;
-    Xn_1 = right[0];
+    Xn_3 = right[0];
 
     r = decoder.decodeNumber();
-    right[1] = Xn_1 - r;
+    right[1] = Xn_3 - r;
     Xn_2 = right[1];
 
     r = decoder.decodeNumber();
-    right[2] = (2*Xn_1 - Xn_2) - r;
-    Xn_3 = right[2];
+    right[2] = (2*Xn_3 - Xn_2) - r;
+    Xn_1 = right[2];
 
     for(int i = 3; i < numSamples; i++){
         r = decoder.decodeNumber();
