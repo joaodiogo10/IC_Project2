@@ -96,16 +96,16 @@ void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<
 /**
 * \brief Main method of the lossless encoder.
 * 
-* Usage: ./encoderLossless ImageName TextFile \n
+* Usage: ./encoderLossless ImageName EncodedFile \n
 *
 * \param[in] ImageName \ref Image to process.
-* \param[in] TextFile \ref Name of the file to save the encoded image.
+* \param[in] EncodedFile \ref Name of the file to save the encoded image.
 */
 int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        cout << "Usage: ./encoderLossless ImageName TextFile" << endl;
+        cout << "Usage: ./encoderLossless ImageName EncodedFile" << endl;
         return -1;
     }
 
@@ -286,14 +286,14 @@ int main(int argc, char *argv[])
         totalVProb += probMapV[i];
     }
 
-    std::cout << "Y prob total"
-              << ": " << totalYProb << '\n';
+    // std::cout << "Y prob total"
+    //           << ": " << totalYProb << '\n';
 
-    std::cout << "U prob total"
-              << ": " << totalUProb << '\n';
+    // std::cout << "U prob total"
+    //           << ": " << totalUProb << '\n';
 
-    std::cout << "V prob total"
-              << ": " << totalVProb << '\n';
+    // std::cout << "V prob total"
+    //           << ": " << totalVProb << '\n';
 
     std::cout << "Y entropy"
               << ": " << -entropyY << '\n';
