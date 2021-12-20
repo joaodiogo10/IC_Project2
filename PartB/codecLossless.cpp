@@ -16,73 +16,81 @@ std::vector<double> calculateEntropyAndResidualHistograms(const std::vector<std:
 /**
  * \brief Converts the amplitude of an audio channel form a vector of doubles to a vector of integers
  * 
- * The arguments of the function are a vector of doubles of the audio channel and the bitDepth of said channel
- * 
- * Returns a vector of the audio channel converted to ints
+ * \param channel Vector of doubles from the audio channel to convert
+ * \param bitDepth bitDepth of the audio channel
+ * \return Vector of integers from the converted audio channel
  */
 std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth);
 
 /**
  * \brief Converts the amplitude of an audio channel form a vector of integers to its original state
  * 
- * The arguments of the function are a vector of ints of the converted audio channel and the bitDepth of said channel
- * 
- * Returns a vector of doubles of the audio channel from its original state
+ * \param channel Vector of integers from the converted audio channel
+ * \param bitDepth bitDepth of the audio channel
+ * \return Vector of doubles from the original audio channel
  */
 std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channel, const int bitDepth);
 
 /**
  * \brief Encodes file on a first order predictor basis
  * 
- * The arguments of the function are the audio file to encode and the name of the encoded output file
- * 
- * Returns a vector of the residual values of the encoded file
+ * \param audioFile audioFile to encode
+ * \param outputFilePath name of the encoded output file
+ * \return Vector of the residual values of the encoded file
+ * \return Predictor encoded file of the audio file
  */
 std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
  * \brief Decodes file on a first order predictor basis
  * 
- * The arguments of the function are the encoded file to decode and the name of the audio output file
+ * \param encodedFilePath path of the predictor encoded file
+ * \param outputFilePath name of the decoded output file
+ * \return Decoded audio file
  */
 void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath);
 
 /**
  * \brief Encodes file on a polynomial predictor basis
  * 
- * The arguments of the function are the audio file to encode and the name of the encoded output file
- * 
- * Returns a vector of the residual values of the encoded file
+ * \param audioFile audioFile to encode
+ * \param outputFilePath name of the encoded output file
+ * \return Vector of the residual values of the encoded file
+ * \return Polynomial encoded file of the audio file
  */
 std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
  * \brief Decodes file on a polynomial predictor basis
  * 
- * The arguments of the function are the encoded file to decode and the name of the audio output file
+ * \param encodedFilePath path of the polynomial encoded file
+ * \param outputFilePath name of the decoded output file
+ * \return Decoded audio file
  */
 void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath);
 
 /**
  * \brief Encodes file on a redundancy basis
- * 
- * The arguments of the function are the audio file to encode and the name of the encoded output file 
- * 
- * Returns a vector of the residual values of the encoded file
+ * \param audioFile audioFile to encode
+ * \param outputFilePath name of the encoded output file
+ * \return Vector of the residual values of the encoded file
+ * \return Redundancy encoded file of the audio file
  */
 std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
  * \brief Decodes file on a redundancy basis
  * 
- * The arguments of the function are the encoded file to decode and the name of the audio output file
+ * \param encodedFilePath path of the redundancy encoded file
+ * \param outputFilePath name of the decoded output file
+ * \return Decoded audio file
  */
 void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath);
 
 //------------------------------------------------------------
 //-------------------Constants--------------------------------
 //------------------------------------------------------------
-const uint16_t headerM = 200;
+const uint16_t headerM = 200; 
 const std::string resultDir = "../results";
 const std::string matlabDir = "../matlab";
 
@@ -101,6 +109,15 @@ const std::tuple<EncoderFunction,DecoderFunction> codecArray[] =
     {&redundancyPredictorEncoder, &redundancyDecoder}                               //  redundacyCodec
 };                                                                  /*!< tuple of which functions to call on main function */
 
+/**
+ * \brief Main method of lossless codec
+ * 
+ * Usage: ./codecLossless <AudioFilePath> <CodecNumber> <OutputFile>
+ * 
+ * \param AudioFilePath input audio file
+ * \param CodecNumber target codec number
+ * \param OutputFile output file name for results
+ */
 int main(int argc, char *argv[]){
     if (argc < 4 || std::atoi(argv[2]) > 2 || std::atoi(argv[2]) < 0) {
         std::cout << "Usage: ./codecLossless <AudioFilePath> <CodecNumber> <OutputFile>" << std::endl;

@@ -1,2 +1,4 @@
 Valores residuais??
 sample01 polynomal encoder?
+
+versao diferentes do polinomial mesma entropia?
