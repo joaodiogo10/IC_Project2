@@ -32,7 +32,7 @@ std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> chan
 std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channel, const int bitDepth);
 
 /**
- * \brief Encodes file on a first order predictor basis
+ * \brief Encodes file on a first order predictor basis and according to the reducing factor
  * 
  * \param audioFile audioFile to encode
  * \param outputFilePath name of the encoded output file
@@ -42,7 +42,7 @@ std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channe
 std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
- * \brief Decodes file on a first order predictor basis
+ * \brief Decodes file on a first order predictor basis and according to the reducing factor
  * 
  * \param encodedFilePath path of the predictor encoded file
  * \param outputFilePath name of the decoded output file
@@ -51,7 +51,7 @@ std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audio
 void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath);
 
 /**
- * \brief Encodes file on a polynomial predictor basis
+ * \brief Encodes file on a polynomial predictor basis and according to the reducing factor
  * 
  * \param audioFile audioFile to encode
  * \param outputFilePath name of the encoded output file
@@ -61,7 +61,7 @@ void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputF
 std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
- * \brief Decodes file on a polynomial predictor basis
+ * \brief Decodes file on a polynomial predictor basis and according to the reducing factor
  * 
  * \param encodedFilePath path of the polynomial encoded file
  * \param outputFilePath name of the decoded output file
@@ -70,7 +70,7 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
 void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath);
 
 /**
- * \brief Encodes file on a redundancy basis
+ * \brief Encodes file on a redundancy basis and according to the reducing factor
  * \param audioFile audioFile to encode
  * \param outputFilePath name of the encoded output file
  * \return Vector of the residual values of the encoded file
@@ -79,7 +79,7 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath);
 std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
 
 /**
- * \brief Decodes file on a redundancy basis
+ * \brief Decodes file on a redundancy basis and according to the reducing factor
  * 
  * \param encodedFilePath path of the redundancy encoded file
  * \param outputFilePath name of the decoded output file
@@ -111,6 +111,17 @@ const std::tuple<EncoderFunction,DecoderFunction> codecArray[] =
 
 //Global variable
 int reduceFactor = 0;
+
+/**
+ * \brief Main method of lossy codec
+ * 
+ * Usage: ./codecLossy <AudioFilePath> <CodecNumber> <OutputFile> <ReduceFactor>
+ * 
+ * \param AudioFilePath input audio file
+ * \param CodecNumber target codec number
+ * \param OutputFile output file name for results
+ * \param ReduceFactor number of bits to reduce (15 to 0)
+ */
 int main(int argc, char *argv[]){
     if (argc < 5 || std::atoi(argv[2]) > 2 || std::atoi(argv[2]) < 0 || std::atoi(argv[4]) > 15 || std::atoi(argv[4]) < 0) {
         std::cout << "Usage: ./codecLossy <AudioFilePath> <CodecNumber> <OutputFile> <ReduceFactor>" << std::endl;
