@@ -8,7 +8,8 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
     else
         fileStream.open(file, std::ios_base::out | std::ios_base::binary);
 
-    if (handleOpenError()) {
+    if (handleOpenError())
+    {
         fOpen = false;
         return;
     }
@@ -21,7 +22,7 @@ BitStream::BitStream(const std::string file, BitStream::bs_mode mode)
 
 BitStream::~BitStream()
 {
-    if(fOpen && mode == bs_mode::write)
+    if (fOpen && mode == bs_mode::write)
     {
         flushBuffer();
     }
@@ -63,7 +64,7 @@ bool BitStream::writeBit(const unsigned char bit)
 {
     if (!validWriteOperation())
         return false;
-    
+
     buffer = (buffer << 1) | (bit & 0x01);
     bufferCount++;
 
@@ -83,7 +84,7 @@ bool BitStream::writeBit(const unsigned char bit)
 
 bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
 {
-    if(!validReadOperation())
+    if (!validReadOperation())
         return false;
 
     int bitsToRead = nBits;
@@ -154,7 +155,7 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
     {
         //align last array byte do the left
         u_char emptyBits = BUFFER_SIZE - arrayOffset;
-        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits;  
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits;
         bufferCount = 0;
         return true;
     }
@@ -174,7 +175,7 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
 
         //align last array byte do the left
         u_char emptyBits = BUFFER_SIZE - (arrayOffset + bitsRemaining);
-        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits; 
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits;
     }
     //else we will need another byte in array
     else
@@ -189,7 +190,7 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
 
         //align last array byte do the left
         u_char emptyBits = tmp;
-        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits; 
+        bits[bytesRemaining] = bits[bytesRemaining] >> emptyBits;
     }
 
     bufferCount = BUFFER_SIZE - bitsRemaining;
@@ -199,11 +200,12 @@ bool BitStream::readNBits(unsigned char *bits, const unsigned int nBits)
 
 bool BitStream::writeNBits(const unsigned char *bits, const unsigned int nBits)
 {
-    if (nBits == 0) {
+    if (nBits == 0)
+    {
         std::cout << "ERROR: Write more than 0 bits" << std::endl;
         return false;
     }
-    if(!validWriteOperation())
+    if (!validWriteOperation())
         return false;
 
     int bytesToRead = double(nBits) / 8;
@@ -211,38 +213,23 @@ bool BitStream::writeNBits(const unsigned char *bits, const unsigned int nBits)
     unsigned char auxBuffer, bit;
 
     //For multiples of 8
-    if (bitsRemaining == 0)
+    for (int i = 0; i < bytesToRead; i++)
     {
-        for (int i = 0; i < bytesToRead; i++)
+        auxBuffer = bits[i];
+
+        for (int j = 0; j < 8; j++)
         {
-            auxBuffer = bits[i];
+            bit = auxBuffer & 0x80;
+            bit = bit >> 7;
+            auxBuffer = auxBuffer << 1;
 
-            for (int j = 0; j < 8; j++)
-            {
-                bit = auxBuffer & 0x80;
-                bit = bit >> 7;
-                auxBuffer = auxBuffer << 1;
-
-                writeBit(bit);
-            }
+            writeBit(bit);
         }
     }
+
     //for the bits remaining
-    else
+    if (bitsRemaining != 0)
     {
-        for (int i = 0; i < bytesToRead; i++)
-        {
-            auxBuffer = bits[i];
-
-            for (int j = 0; j < 8; j++)
-            {
-                bit = auxBuffer & 0x80;
-                bit = bit >> 7;
-                auxBuffer = auxBuffer << 1;
-                writeBit(bit);
-            }
-        }
-
         auxBuffer = bits[bytesToRead];
 
         for (int j = 0; j < bitsRemaining; j++)
@@ -256,19 +243,20 @@ bool BitStream::writeNBits(const unsigned char *bits, const unsigned int nBits)
     return true;
 }
 
-bool BitStream::flushBuffer(uint8_t bit) {
+bool BitStream::flushBuffer(uint8_t bit)
+{
     if (!validWriteOperation())
         return false;
 
-    if(bufferCount == 0)
+    if (bufferCount == 0)
         return true;
-    
+
     uint8_t shiftAmount = (BUFFER_SIZE - bufferCount);
 
     char tmp = buffer << shiftAmount;
-    if((bit & 0x01) == 1)
-        tmp = tmp | ((uint8_t) std::pow(2,shiftAmount) * (bit & 0x01) - 1);
-    
+    if ((bit & 0x01) == 1)
+        tmp = tmp | ((uint8_t)std::pow(2, shiftAmount) * (bit & 0x01) - 1);
+
     fileStream.write(&tmp, 1);
     if (handleWriteError())
         return false;
@@ -278,11 +266,13 @@ bool BitStream::flushBuffer(uint8_t bit) {
     return true;
 }
 
-bool BitStream::flushBuffer() {
+bool BitStream::flushBuffer()
+{
     return flushBuffer(0);
 }
 
-const bool BitStream::validReadOperation() {
+const bool BitStream::validReadOperation()
+{
     if (!fOpen)
     {
         std::cout << "ERROR: File is closed" << std::endl;
@@ -297,7 +287,8 @@ const bool BitStream::validReadOperation() {
     return true;
 }
 
-const bool BitStream::validWriteOperation() {
+const bool BitStream::validWriteOperation()
+{
     if (!fOpen)
     {
         std::cout << "ERROR: File is closed" << std::endl;
@@ -312,7 +303,8 @@ const bool BitStream::validWriteOperation() {
     return true;
 }
 
-bool BitStream::open(std::string file, BitStream::bs_mode mode) {
+bool BitStream::open(std::string file, BitStream::bs_mode mode)
+{
     if (fOpen)
     {
         std::cerr << "ERROR: File is already opened!" << std::endl;
@@ -334,13 +326,14 @@ bool BitStream::open(std::string file, BitStream::bs_mode mode) {
     return true;
 }
 
-bool BitStream::close() {
+bool BitStream::close()
+{
     if (!fOpen)
     {
         std::cerr << "ERROR: File is already closed!" << std::endl;
         return false;
     }
-    if(mode == BitStream::bs_mode::write)
+    if (mode == BitStream::bs_mode::write)
         flushBuffer();
 
     fileStream.close();
@@ -352,7 +345,8 @@ bool BitStream::close() {
     return true;
 }
 
-const bool BitStream::isOpen() {
+const bool BitStream::isOpen()
+{
     return fOpen;
 }
 
