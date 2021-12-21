@@ -12,7 +12,7 @@ using namespace cv;
 */
 
 /**
-* \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original value based on this mode.
+* \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
 * It adds the previous pixel intensity to the current one. \n
 * In the case of the first column it considers the previous value to be zero. \n
@@ -29,14 +29,36 @@ using namespace cv;
 void reversePredictor1(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 
 /**
-* \brief Fazer para esta.
+* \brief Reverse method for the second of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
+* It adds the above pixel intensity to the current one. \n
+* In the case of the first row it considers the above value to be zero. \n
+* \n
+* Each original value is saved in the respective Mat.
+* 
+* \param[in] YResiduals \ref cv::Mat with the residuals of the Y component.
+* \param[in] UReducedResiduals \ref cv::Mat with the residuals of the U component.
+* \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
 void reversePredictor2(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 
 /**
-* \brief Fazer para esta.
+* \brief Reverse method for the third of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
+* It adds the left diagonal pixel intensity to the current one. \n
+* In the case of the first row and column it considers the left diagonal value to be zero. \n
+* \n
+* Each original value is saved in the respective Mat.
+* 
+* \param[in] YResiduals \ref cv::Mat with the residuals of the Y component.
+* \param[in] UReducedResiduals \ref cv::Mat with the residuals of the U component.
+* \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
 void reversePredictor3(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 

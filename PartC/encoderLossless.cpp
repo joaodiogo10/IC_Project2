@@ -48,7 +48,7 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 /**
 * \brief First of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
-* It subtracts the previous pixel intensity to the current one. \n
+* It subtracts the previous pixel intensity from the current one. \n
 * In the case of the first column it considers the previous value to be zero. \n
 * \n
 * Each residual value is saved in the respective Mat.
@@ -63,14 +63,36 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
-* \brief Fazer para esta.
+* \brief Second of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
+* It subtracts the above pixel intensity from the current one. \n
+* In the case of the first row it considers the above value to be zero. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
 */
 void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
-* \brief Fazer para esta.
+* \brief Third of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
+* It subtracts the left diagonal pixel intensity from the current one. \n
+* In the case of the first row and first column it considers the left diagonal value to be zero. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
 */
 void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
@@ -81,7 +103,7 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
-* \brief Method to save the frequency ot the residual values of the components in files to further calculate the histograms.
+* \brief Method to save the frequency of the residual values of the components in files to further calculate the histograms.
 * 
 * It saves a file with the values to the xAxis, from -255 to 255, named xAxis.txt. \n
 * For each map, it saves a file with all the frequencies of the values between -255 and 255. \n
