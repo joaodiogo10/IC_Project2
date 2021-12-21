@@ -303,31 +303,35 @@ std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audio
         y[i] = y[i-1] + (r << reduceFactor);
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
-
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    int m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int m2 = golomb.getOtimizedM(encodedResiduals[1]);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
     }
+
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
+    }
+
     return encodedResiduals;
 }
 
 void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
-
+    decoder.setM(m1);
     std::vector<int> left;
     left.resize(numSamples);
     std::vector<int> right;
@@ -345,6 +349,7 @@ void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) 
         previous = x[i];
     }
 
+    decoder.setM(m2);
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber() << reduceFactor;
         y[i] = r + previous;
@@ -438,18 +443,21 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
         right[i] = (3*right[i-1] - 3*right[i-2] + right[i-3]) - (r << reduceFactor);
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
-
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    int32_t m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int32_t m2 = golomb.getOtimizedM(encodedResiduals[1]);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
+    }
+
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
     }
     
     return encodedResiduals;
@@ -458,11 +466,13 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
 void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
+    //set m for channel 1
+    decoder.setM(m1);
 
     std::vector<int> left;
     left.resize(numSamples);
@@ -485,6 +495,9 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
         r = decoder.decodeNumber() << reduceFactor;
         left[i] = (3*left[i-1] - 3*left[i-2] + left[i-3]) - r;
     }
+
+    //set m for channel 2
+    decoder.setM(m2);
 
     r = decoder.decodeNumber() << reduceFactor;
     right[0] = - r;
@@ -562,30 +575,33 @@ std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audio
         right[i] = right[i-1] + (r << reduceFactor);
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
+    int m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int m2 = golomb.getOtimizedM(encodedResiduals[1]);
 
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
+    }
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
     }
     return encodedResiduals;
 } 
 
 void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
-
+    decoder.setM(m1);
     std::vector<int> left;
     left.resize(numSamples);
 
@@ -599,6 +615,7 @@ void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputF
         previous = left[i];
     }
 
+    decoder.setM(m2);
     previous = 0;
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber() << reduceFactor;

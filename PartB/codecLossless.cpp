@@ -291,18 +291,21 @@ std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audio
         previous = y[i];
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
-
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    int m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int m2 = golomb.getOtimizedM(encodedResiduals[1]);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
+    }
+
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
     }
     return encodedResiduals;
 }
@@ -310,12 +313,12 @@ std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audio
 void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
-
+    decoder.setM(m1);
     std::vector<int> left;
     left.resize(numSamples);
     std::vector<int> right;
@@ -333,6 +336,7 @@ void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) 
         previous = x[i];
     }
 
+    decoder.setM(m2);
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber();
         y[i] = r + previous;
@@ -368,7 +372,7 @@ void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) 
     }
     audioFile.setNumSamplesPerChannel(numSamples);
     bool ok = audioFile.setAudioBuffer(buffer);
-
+    
     if(!ok)
         std::cout << "ERROR: Unable to create audioFile!" << std::endl;
 
@@ -435,18 +439,21 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
         encodedResiduals[1][i] = r;
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
-
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    int32_t m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int32_t m2 = golomb.getOtimizedM(encodedResiduals[1]);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
+    }
+
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
     }
     
     return encodedResiduals;
@@ -455,11 +462,13 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
 void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
+    //set m for channel 1
+    decoder.setM(m1);
 
     std::vector<int> left;
     left.resize(numSamples);
@@ -490,6 +499,9 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
         Xn_1 = left[i];
     }
 
+    //set m for channel 2
+    decoder.setM(m2);
+    
     r = decoder.decodeNumber();
     right[0] = r;
     Xn_3 = right[0];
@@ -499,7 +511,7 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
     Xn_2 = right[1];
 
     r = decoder.decodeNumber();
-    right[2] = (2*Xn_3 - Xn_2) - r;
+    right[2] = (2*Xn_2 - Xn_3) - r;
     Xn_1 = right[2];
 
     for(int i = 3; i < numSamples; i++){
@@ -562,30 +574,33 @@ std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audio
         previous = right[i];
     }
 
-    std::vector<int> valueDistribution;
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[0].begin(), encodedResiduals[0].end());
-    valueDistribution.insert(valueDistribution.end(), encodedResiduals[1].begin(), encodedResiduals[1].end());
+    int m1 = golomb.getOtimizedM(encodedResiduals[0]);
+    int m2 = golomb.getOtimizedM(encodedResiduals[1]);
 
-    int m = golomb.getOtimizedM(valueDistribution);
-    golomb.encodeNumber(m);
+    golomb.encodeNumber(m1);
+    golomb.encodeNumber(m2);
     golomb.encodeNumber(numSamples);
     golomb.encodeNumber(bitDepth);
-    golomb.setM(m);
 
-    for(size_t i = 0; i < valueDistribution.size(); i++) {
-        golomb.encodeNumber(valueDistribution[i]);
+    golomb.setM(m1);
+    for(size_t i = 0; i < encodedResiduals[0].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[0][i]);
+    }
+    golomb.setM(m2);
+    for(size_t i = 0; i < encodedResiduals[1].size(); i++) {
+        golomb.encodeNumber(encodedResiduals[1][i]);
     }
     return encodedResiduals;
 } 
 
 void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
-    int32_t M = decoder.decodeNumber();
+    int32_t m1 = decoder.decodeNumber();
+    int32_t m2 = decoder.decodeNumber();
     int32_t numSamples = decoder.decodeNumber();
     int32_t bitDepth = decoder.decodeNumber();
 
-    decoder.setM(M);
-
+    decoder.setM(m1);
     std::vector<int> left;
     left.resize(numSamples);
 
@@ -593,12 +608,14 @@ void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputF
     right.resize(numSamples);
 
     int r, previous = 0;
+
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber();
         left[i] = r + previous;
         previous = left[i];
     }
 
+    decoder.setM(m2);
     for(int i = 0; i < numSamples; i++){
         r = decoder.decodeNumber();
         right[i] = r + previous;
