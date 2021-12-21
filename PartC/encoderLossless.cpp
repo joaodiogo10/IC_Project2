@@ -56,29 +56,29 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 * \param[in] YComponent \ref cv::Mat with the values of Y.
 * \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
 * \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
-* \param[in,out] YPredictor \ref cv::Mat to store the residuals of the Y component.
-* \param[in,out] UReducedPredictor \ref cv::Mat to store the residuals of the U component.
-* \param[in,out] VReducedPredictor \ref cv::Mat to store the residuals of the V component.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
 */
-void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
 * \brief Fazer para esta.
 * 
 */
-void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
 * \brief Fazer para esta.
 * 
 */
-void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
 * \brief Fazer para esta.
 * 
 */
-uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor);
+uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
 * \brief Method to save the frequency ot the residual values of the components in files to further calculate the histograms.
@@ -144,19 +144,17 @@ int main(int argc, char *argv[])
     convertToYUV(srcImage, YComponent, UComponent, VComponent);
     convertTo420(YComponent, UComponent, VComponent, UComponentReduced, VComponentReduced);
 
-    //Matrices for predictor values
-    cv::Mat YPredictor = cv::Mat::zeros(srcImage.rows, srcImage.cols, CV_32SC1);
-    cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
-    cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    //Matrices for residual values
+    cv::Mat YResiduals = cv::Mat::zeros(srcImage.rows, srcImage.cols, CV_32SC1);
+    cv::Mat UReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    cv::Mat VReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
-    predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor);
-
-    uint32_t m;
+    predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
 
     //Encode Header with fixed m = 400
     Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
 
-    m = getOptimalM(YPredictor, UReducedPredictor, VReducedPredictor);
+    uint32_t m = getOptimalM(YResiduals, UReducedResiduals, VReducedResiduals);
     std::cout << "Optimal m: " << m << std::endl;
 
     //encode m
@@ -172,35 +170,29 @@ int main(int argc, char *argv[])
     encoder.setM(m);
 
     //encode Y
-    short *pYPred;
-    for (int i = 0; i < YPredictor.rows; i++)
+    for (int i = 0; i < YResiduals.rows; i++)
     {
-        pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YPredictor.cols; j++)
+        for (int j = 0; j < YResiduals.cols; j++)
         {
-            encoder.encodeNumber(pYPred[j]);
+            encoder.encodeNumber(YResiduals.ptr<short>(i)[j]);
         }
     }
 
     //encode U
-    short *pUPred;
-    for (int i = 0; i < UReducedPredictor.rows; i++)
+    for (int i = 0; i < UReducedResiduals.rows; i++)
     {
-        pUPred = UReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < UReducedPredictor.cols; j++)
+        for (int j = 0; j < UReducedResiduals.cols; j++)
         {
-            encoder.encodeNumber(pUPred[j]);
+            encoder.encodeNumber(UReducedResiduals.ptr<short>(i)[j]);
         }
     }
 
     //encode V
-    short *pVPred;
-    for (int i = 0; i < VReducedPredictor.rows; i++)
+    for (int i = 0; i < VReducedResiduals.rows; i++)
     {
-        pVPred = VReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < VReducedPredictor.cols; j++)
+        for (int j = 0; j < VReducedResiduals.cols; j++)
         {
-            encoder.encodeNumber(pVPred[j]);
+            encoder.encodeNumber(VReducedResiduals.ptr<short>(i)[j]);
         }
     }
 
@@ -208,63 +200,43 @@ int main(int argc, char *argv[])
 
     map<int, double> mapY, mapU, mapV;
     double totalY = 0, totalU = 0, totalV = 0;
-    int countY = 0, countU = 0, countV = 0;
 
-    //Frequency counting for residuals
     for (int i = -255; i < 256; i++)
     {
-        countY = 0;
-        countU = 0;
-        countV = 0;
-        for (int k = 0; k < YPredictor.rows; k++)
+        mapY[i] = 0;
+        mapU[i] = 0;
+        mapV[i] = 0;
+    }
+
+    //Frequency counting for residuals
+    for (int i = 0; i < YResiduals.rows; i++)
+    {
+        for (int j = 0; j < YResiduals.cols; j++)
         {
-            pYPred = YPredictor.ptr<short>(k);
-            for (int j = 0; j < YPredictor.cols; j++)
-            {
-                if (pYPred[j] == i)
-                {
-                    countY++;
-                    totalY++;
-                }
-            }
+            mapY[YResiduals.ptr<short>(i)[j]] += 1;
+            totalY++;
         }
+    }
 
-        for (int k = 0; k < UReducedPredictor.rows; k++)
+    for (int i = 0; i < UReducedResiduals.rows; i++)
+    {
+        for (int j = 0; j < UReducedResiduals.cols; j++)
         {
-            pUPred = UReducedPredictor.ptr<short>(k);
-            pVPred = VReducedPredictor.ptr<short>(k);
-            for (int j = 0; j < UReducedPredictor.cols; j++)
-            {
-                if (pUPred[j] == i)
-                {
-                    countU++;
-                    totalU++;
-                }
-
-                if (pVPred[j] == i)
-                {
-                    countV++;
-                    totalV++;
-                }
-            }
+            mapU[UReducedResiduals.ptr<short>(i)[j]] += 1;
+            mapV[VReducedResiduals.ptr<short>(i)[j]] += 1;
+            totalU++;
+            totalV++;
         }
-
-        mapY[i] = countY;
-        mapU[i] = countU;
-        mapV[i] = countV;
     }
 
     double entropyY = 0, entropyU = 0, entropyV = 0;
     map<int, double> probMapY, probMapU, probMapV;
-    double totalYProb = 0, totalUProb = 0, totalVProb = 0;
 
     for (int i = -255; i < 256; i++)
     {
         probMapY[i] = mapY[i] / totalY;
         probMapU[i] = mapU[i] / totalU;
         probMapV[i] = mapV[i] / totalV;
-
-        //cout << "prob map Y: " << probMapY[i] << endl;
 
         if (probMapY[i] != 0)
         {
@@ -280,20 +252,7 @@ int main(int argc, char *argv[])
         {
             entropyV += probMapV[i] * log2(probMapV[i]);
         }
-
-        totalYProb += probMapY[i];
-        totalUProb += probMapU[i];
-        totalVProb += probMapV[i];
     }
-
-    // std::cout << "Y prob total"
-    //           << ": " << totalYProb << '\n';
-
-    // std::cout << "U prob total"
-    //           << ": " << totalUProb << '\n';
-
-    // std::cout << "V prob total"
-    //           << ": " << totalVProb << '\n';
 
     std::cout << "Y entropy"
               << ": " << -entropyY << '\n';
@@ -373,173 +332,143 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
     }
 }
 
-void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
-    uchar *pY, *pU, *pV;
-    short *pYPred, *pUPred, *pVPred;
-
-    //Predictor for Y
+    //Residuals for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
-        pY = YComponent.ptr<uchar>(i);
-        pYPred = YPredictor.ptr<short>(i);
-        pYPred[0] = pY[0];
+        YResiduals.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0];
         for (int j = 1; j < YComponent.cols; j++)
         {
-            pYPred[j] = pY[j] - pY[j - 1];
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i)[j - 1];
         }
     }
 
     //Predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
     {
-        pU = UComponentReduced.ptr<uchar>(i);
-        pUPred = UReducedPredictor.ptr<short>(i);
-        pV = VComponentReduced.ptr<uchar>(i);
-        pVPred = VReducedPredictor.ptr<short>(i);
-        pUPred[0] = pU[0];
-        pVPred[0] = pV[0];
+        UReducedResiduals.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
+        VReducedResiduals.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
         for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pUPred[j] = pU[j] - pU[j - 1];
-
-            pVPred[j] = pV[j] - pV[j - 1];
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i)[j - 1];
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i)[j - 1];
         }
     }
 }
 
-void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
-    //Predictor for Y
-
+    //Residuals for Y
     //first row, Predictor = 0
-    int rowLength = YComponent.rows;
-    int colLength = YComponent.cols;
-    for (int i = 0; i < rowLength; i++)
+    for (int i = 0; i < YComponent.rows; i++)
     {
-        YPredictor.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
     }
     //Remaining rows, Predictor = b
-    for (int i = 1; i < rowLength; i++)
+    for (int i = 1; i < YComponent.rows; i++)
     {
-        for (int j = 0; j < colLength; j++)
+        for (int j = 0; j < YComponent.cols; j++)
         {
-            YPredictor.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j];
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j];
         }
     }
 
-    //Predictor for U and V
+    //Residuals for U and V
     //first row, Predictor = 0
-    rowLength = UComponentReduced.rows;
-    colLength = UComponentReduced.cols;
-
-    for (int i = 0; i < rowLength; i++)
+    for (int i = 0; i < UComponentReduced.rows; i++)
     {
-        UReducedPredictor.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
-        VReducedPredictor.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
     }
 
     //Remaining rows, Predictor = b
-    for (int i = 1; i < rowLength; i++)
+    for (int i = 1; i < UComponentReduced.rows; i++)
     {
-        for (int j = 0; j < colLength; j++)
+        for (int j = 0; j < UComponentReduced.cols; j++)
         {
-            UReducedPredictor.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j];
-            VReducedPredictor.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j];
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j];
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j];
         }
     }
 }
 
-void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
-    //Predictor for Y
+    //Residuals for Y
     //first row, Predictor = 0
-    int rowLength = YComponent.rows;
-    int colLength = YComponent.cols;
-    for (int i = 0; i < rowLength; i++)
+    for (int i = 0; i < YComponent.rows; i++)
     {
-        YPredictor.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
     }
 
-    for (int i = 1; i < rowLength; i++)
+    for (int i = 1; i < YComponent.rows; i++)
     {
         //first column predictor = 0
-        YPredictor.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0];
+        YResiduals.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0];
 
         //Remaining columns, Predictor = c
-        for (int j = 1; j < colLength; j++)
+        for (int j = 1; j < YComponent.cols; j++)
         {
-            YPredictor.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j - 1];
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j - 1];
         }
     }
 
-    //Predictor for U and V
+    //Residuals for U and V
     //first row, Predictor = 0
-    rowLength = UComponentReduced.rows;
-    colLength = UComponentReduced.cols;
-
-    for (int i = 0; i < rowLength; i++)
+    for (int i = 0; i < UComponentReduced.rows; i++)
     {
-        UReducedPredictor.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
-        VReducedPredictor.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
     }
 
-    for (int i = 1; i < rowLength; i++)
+    for (int i = 1; i < UComponentReduced.rows; i++)
     {
         //first column predictor = 0
-        UReducedPredictor.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
-        VReducedPredictor.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
+        UReducedResiduals.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
+        VReducedResiduals.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
 
         //Remaining columns, Predictor = c
-        for (int j = 0; j < colLength; j++)
+        for (int j = 0; j < UComponentReduced.cols; j++)
         {
-            UReducedPredictor.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j - 1];
-            VReducedPredictor.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j - 1];
         }
     }
 }
 
-uint32_t getOptimalM(cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor)
+uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
     uint32_t m = 0;
     std::vector<int> values;
-    uint32_t size = YPredictor.rows * YPredictor.cols + UReducedPredictor.rows * UReducedPredictor.cols + VReducedPredictor.rows * VReducedPredictor.cols;
+    uint32_t size = YResiduals.rows * YResiduals.cols + UReducedResiduals.rows * UReducedResiduals.cols + VReducedResiduals.rows * VReducedResiduals.cols;
 
     values.resize(size);
     uint32_t valuesCount = 0;
 
-    short *pYPred;
-    for (int i = 0; i < YPredictor.rows; i++)
+    for (int i = 0; i < YResiduals.rows; i++)
     {
-        pYPred = YPredictor.ptr<short>(i);
-        for (int j = 0; j < YPredictor.cols; j++)
+        for (int j = 0; j < YResiduals.cols; j++)
         {
-            values[valuesCount] = pYPred[j];
+            values[valuesCount] = YResiduals.ptr<short>(i)[j];
             valuesCount++;
         }
     }
 
-    //encode U
-    short *pUPred;
-    for (int i = 0; i < UReducedPredictor.rows; i++)
+    for (int i = 0; i < UReducedResiduals.rows; i++)
     {
-        pUPred = UReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < UReducedPredictor.cols; j++)
+        for (int j = 0; j < UReducedResiduals.cols; j++)
         {
-
-            values[valuesCount] = pUPred[j];
+            values[valuesCount] = UReducedResiduals.ptr<short>(i)[j];
             valuesCount++;
         }
     }
 
-    //encode V
-    short *pVPred;
-    for (int i = 0; i < VReducedPredictor.rows; i++)
+    for (int i = 0; i < VReducedResiduals.rows; i++)
     {
-        pVPred = VReducedPredictor.ptr<short>(i);
-        for (int j = 0; j < VReducedPredictor.cols; j++)
+        for (int j = 0; j < VReducedResiduals.cols; j++)
         {
-            values[valuesCount] = pVPred[j];
+            values[valuesCount] = VReducedResiduals.ptr<short>(i)[j];
             valuesCount++;
         }
     }
