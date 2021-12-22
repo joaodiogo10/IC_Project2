@@ -48,8 +48,8 @@ void reversePredictor2(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat 
 /**
 * \brief Reverse method for the third of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
-* It adds the left diagonal pixel intensity to the current one. \n
-* In the case of the first row and column it considers the left diagonal value to be zero. \n
+* It adds the top left diagonal pixel intensity to the current one. \n
+* In the case of the first row and column it considers the top left diagonal value to be zero. \n
 * \n
 * Each original value is saved in the respective Mat.
 * 

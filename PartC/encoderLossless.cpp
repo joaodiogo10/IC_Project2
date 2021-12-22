@@ -82,8 +82,8 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 /**
 * \brief Third of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
-* It subtracts the left diagonal pixel intensity from the current one. \n
-* In the case of the first row and first column it considers the left diagonal value to be zero. \n
+* It subtracts the top left diagonal pixel intensity from the current one. \n
+* In the case of the first row and first column it considers the top left diagonal value to be zero. \n
 * \n
 * Each residual value is saved in the respective Mat.
 * 
