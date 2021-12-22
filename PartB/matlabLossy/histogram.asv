@@ -1,0 +1,65 @@
+plotResult("sample01", "4");
+plotResult("sample02", "4");
+plotResult("sample03", "4");
+plotResult("sample04", "4");
+plotResult("sample05", "4");
+plotResult("sample06", "4");
+plotResult("sample07", "4");
+plotResult("sample01", "10");
+plotResult("sample02", "10");
+plotResult("sample03", "10");
+plotResult("sample04", "10");
+plotResult("sample05", "10");
+plotResult("sample06", "10");
+plotResult("sample07", "10");
+
+function e = plotResult(name, nBits)
+    formatSpec = '%d';
+    fileChannel1 = fopen(nBits + '_bits/' + name + 'Matlab/FirstOrderCodec/channel1.txt','r');
+    channel1 = fscanf(fileChannel1,formatSpec);
+    
+    fileChannel2= fopen(nBits + '_bits/' + name + 'Matlab/FirstOrderCodec/channel2.txt','r');
+    channel2 = fscanf(fileChannel2,formatSpec);
+
+    f = figure('visible','off');
+    xAxisCh1 = -500:500;
+    xAxisCh2 = -500:500;
+    channel1 = channel(size(channel1/2-500):size(channel1/2+500.1));
+    channel2 = channel(size(channel2/2-500):size(channel2/2+500));
+    plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
+    legend("Channel 1", "Channel 2")
+    xlabel("Residuais");
+    grid on;
+    saveas(f, "../resultsLossy/"  + nBits + '_bits/' + name + 'Results/FirstOrderCodec/' + name + '.png')
+
+    formatSpec = '%d';
+    fileChannel1 = fopen(nBits + '_bits/' + name + 'Matlab/PolynomialCodec/channel1.txt','r');
+    channel1 = fscanf(fileChannel1,formatSpec);
+    
+    fileChannel2= fopen(nBits + '_bits/' + name + 'Matlab/PolynomialCodec/channel2.txt','r');
+    channel2 = fscanf(fileChannel2,formatSpec);
+
+    f = figure('visible','off');
+    xAxisCh1=(-length(channel1)/2+1):(length(channel1)/2);
+    xAxisCh2=(-length(channel2)/2+1):(length(channel2)/2);
+    plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
+    legend("Channel 1", "Channel 2")
+    xlabel("Residuais");
+    grid on;
+    saveas(f, "../resultsLossy/" + nBits + '_bits/' + name + 'Results/PolynomialCodec/' + name + '.png')
+
+    fileChannel1= fopen(nBits + '_bits/' + name + 'Matlab/RedundancyCodec/channel2.txt','r');
+    channel1 = fscanf(fileChannel1,formatSpec);
+
+    fileChannel2= fopen(nBits + '_bits/' + name + 'Matlab/RedundancyCodec/channel2.txt','r');
+    channel2 = fscanf(fileChannel2,formatSpec);
+
+    f = figure('visible','off');
+    xAxisCh1=(-length(channel1)/2+1):(length(channel1)/2);
+    xAxisCh2=(-length(channel2)/2+1):(length(channel2)/2);
+    plot(xAxisCh1, channel1, 'b', xAxisCh2, channel2, 'r');
+    legend("Channel 1", "Channel 2")
+    xlabel("Residuais");
+    grid on;
+    saveas(f, "../resultsLossy/"  + nBits + '_bits/'  + name + 'Results/RedundancyCodec/' + name + '.png')
+end
