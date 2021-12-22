@@ -44,26 +44,27 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 * \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
-void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor,
-                Golomb &encoder, int reduceY, int reduceU, int reduceV);
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV);
+uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
+void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV);
 
 /**
 * \brief Main method of the lossy encoder.
 * 
-* Usage: ./encoderLossless ImageName EncodedFile m NumberToReduceY NumberToReduceU NumberToReduceV \n
+* Usage: ./encoderLossless ImageName EncodedFile NumberToReduceY NumberToReduceU NumberToReduceV \n
 *
 * \param[in] ImageName \ref Image to process.
 * \param[in] EncodedFile \ref Name of the file to save the encoded image.
-* \param[in] m \ref m to the golomb codification.
 * \param[in] NumberToReduceY \ref Number os bits to reduce Y.
 * \param[in] NumberToReduceU \ref Number of bits to reduce U.
 * \param[in] NumberToReduceV \ref Number of bits to reduce V.
 */
 int main(int argc, char *argv[])
 {
-    if (argc < 7)
+    if (argc < 6)
     {
-        cout << "Usage: ./encoderLossy ImageName EncodedFile m NumberToReduceY NumberToReduceU NumberToReduceV" << endl;
+        cout << "Usage: ./encoderLossy ImageName EncodedFile NumberToReduceY NumberToReduceU NumberToReduceV" << endl;
         return -1;
     }
 
@@ -102,23 +103,33 @@ int main(int argc, char *argv[])
     convertToYUV(srcImage, YComponent, UComponent, VComponent);
     convertTo420(YComponent, UComponent, VComponent, UComponentReduced, VComponentReduced);
 
-    //Matrices for predictor values
-    cv::Mat YPredictor = cv::Mat::zeros(srcImage.rows, srcImage.cols, CV_32SC1);
-    cv::Mat UReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
-    cv::Mat VReducedPredictor = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    imwrite("Y.png", YComponent);
+    imwrite("U.png", UComponent);
+    imwrite("V.png", VComponent);
+    imwrite("UReduced.png", UComponentReduced);
+    imwrite("VReduced.png", VComponentReduced);
 
-    int m, reduceY, reduceU, reduceV;
-    std::istringstream myStringM((string)argv[3]);
-    myStringM >> m;
-    std::istringstream myStringY((string)argv[4]);
+    //Matrices for residual values
+    cv::Mat YResiduals = cv::Mat::zeros(srcImage.rows, srcImage.cols, CV_32SC1);
+    cv::Mat UReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+    cv::Mat VReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
+
+    int reduceY, reduceU, reduceV;
+
+    std::istringstream myStringY((string)argv[3]);
     myStringY >> reduceY;
-    std::istringstream myStringU((string)argv[5]);
+    std::istringstream myStringU((string)argv[4]);
     myStringU >> reduceU;
-    std::istringstream myStringV((string)argv[6]);
+    std::istringstream myStringV((string)argv[5]);
     myStringV >> reduceV;
+
+    predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
 
     //Encode Header with fixed m = 400
     Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
+
+    uint32_t m = getOptimalM(YResiduals, UReducedResiduals, VReducedResiduals);
+    std::cout << "Optimal m: " << m << std::endl;
 
     //encode m
     encoder.encodeNumber(m);
@@ -141,15 +152,101 @@ int main(int argc, char *argv[])
     //Change encoder m
     encoder.setM(m);
 
-    imwrite("Y.png", YComponent);
-    imwrite("U.png", UComponent);
-    imwrite("V.png", VComponent);
-    imwrite("UReduced.png", UComponentReduced);
-    imwrite("VReduced.png", VComponentReduced);
+    //encode Y
+    for (int i = 0; i < YResiduals.rows; i++)
+    {
+        for (int j = 0; j < YResiduals.cols; j++)
+        {
+            encoder.encodeNumber(YResiduals.ptr<short>(i)[j]);
+        }
+    }
 
-    predictor1(YComponent, UComponentReduced, VComponentReduced, YPredictor, UReducedPredictor, VReducedPredictor, encoder, reduceY, reduceU, reduceV);
+    //encode U
+    for (int i = 0; i < UReducedResiduals.rows; i++)
+    {
+        for (int j = 0; j < UReducedResiduals.cols; j++)
+        {
+            encoder.encodeNumber(UReducedResiduals.ptr<short>(i)[j]);
+        }
+    }
+
+    //encode V
+    for (int i = 0; i < VReducedResiduals.rows; i++)
+    {
+        for (int j = 0; j < VReducedResiduals.cols; j++)
+        {
+            encoder.encodeNumber(VReducedResiduals.ptr<short>(i)[j]);
+        }
+    }
 
     encoder.close();
+
+    map<int, double> mapY, mapU, mapV;
+    double totalY = 0, totalU = 0, totalV = 0;
+
+    for (int i = -255; i < 256; i++)
+    {
+        mapY[i] = 0;
+        mapU[i] = 0;
+        mapV[i] = 0;
+    }
+
+    //Frequency counting for residuals
+    for (int i = 0; i < YResiduals.rows; i++)
+    {
+        for (int j = 0; j < YResiduals.cols; j++)
+        {
+            mapY[YResiduals.ptr<short>(i)[j]] += 1;
+            totalY++;
+        }
+    }
+
+    for (int i = 0; i < UReducedResiduals.rows; i++)
+    {
+        for (int j = 0; j < UReducedResiduals.cols; j++)
+        {
+            mapU[UReducedResiduals.ptr<short>(i)[j]] += 1;
+            mapV[VReducedResiduals.ptr<short>(i)[j]] += 1;
+            totalU++;
+            totalV++;
+        }
+    }
+
+    double entropyY = 0, entropyU = 0, entropyV = 0;
+    map<int, double> probMapY, probMapU, probMapV;
+
+    for (int i = -255; i < 256; i++)
+    {
+        probMapY[i] = mapY[i] / totalY;
+        probMapU[i] = mapU[i] / totalU;
+        probMapV[i] = mapV[i] / totalV;
+
+        if (probMapY[i] != 0)
+        {
+            entropyY += probMapY[i] * log2(probMapY[i]);
+        }
+
+        if (probMapU[i] != 0)
+        {
+            entropyU += probMapU[i] * log2(probMapU[i]);
+        }
+
+        if (probMapV[i] != 0)
+        {
+            entropyV += probMapV[i] * log2(probMapV[i]);
+        }
+    }
+
+    std::cout << "Y entropy"
+              << ": " << -entropyY << '\n';
+
+    std::cout << "U entropy"
+              << ": " << -entropyU << '\n';
+
+    std::cout << "V entropy"
+              << ": " << -entropyV << '\n';
+
+    writeMatlabVectorFiles(mapY, mapU, mapV);
 
     return 0;
 }
@@ -211,57 +308,95 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
     }
 }
 
-void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YPredictor, cv::Mat &UReducedPredictor, cv::Mat &VReducedPredictor,
-                Golomb &encoder, int reduceY, int reduceU, int reduceV)
+void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV)
 {
-    uchar *pY, *pU, *pV;
-    short *pYPred, *pUPred, *pVPred;
-
-    //Predictor for Y
+    //Residuals for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
-        pY = YComponent.ptr<uchar>(i);
-        pYPred = YPredictor.ptr<short>(i);
-        pYPred[0] = pY[0];
-        encoder.encodeNumber(pYPred[0]);
+        YResiduals.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0];
         for (int j = 1; j < YComponent.cols; j++)
         {
-            pYPred[j] = pY[j] - pY[j - 1];
-            pYPred[j] = pYPred[j] >> reduceY;
-            encoder.encodeNumber(pYPred[j]);
-            pY[j] = pY[j - 1] + (pYPred[j] << reduceY);
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i)[j - 1];
+            YResiduals.ptr<short>(i)[j] = YResiduals.ptr<short>(i)[j] >> reduceY;
+            YComponent.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i)[j - 1] + (YResiduals.ptr<short>(i)[j] << reduceY);
         }
     }
 
-    //Predictor for U
+    //Predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
     {
-        pU = UComponentReduced.ptr<uchar>(i);
-        pUPred = UReducedPredictor.ptr<short>(i);
-        pUPred[0] = pU[0];
-        encoder.encodeNumber(pUPred[0]);
+        UReducedResiduals.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
+        VReducedResiduals.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
         for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pUPred[j] = pU[j] - pU[j - 1];
-            pUPred[j] = pUPred[j] >> reduceU;
-            encoder.encodeNumber(pUPred[j]);
-            pU[j] = pU[j - 1] + (pUPred[j] << reduceU);
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i)[j - 1];
+            UReducedResiduals.ptr<short>(i)[j] = UReducedResiduals.ptr<short>(i)[j] >> reduceU;
+            UComponentReduced.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i)[j - 1] + (UReducedResiduals.ptr<short>(i)[j] << reduceU);
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i)[j - 1];
+            VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
+            VComponentReduced.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j - 1] + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
+        }
+    }
+}
+
+uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
+{
+    uint32_t m = 0;
+    std::vector<int> values;
+    uint32_t size = YResiduals.rows * YResiduals.cols + UReducedResiduals.rows * UReducedResiduals.cols + VReducedResiduals.rows * VReducedResiduals.cols;
+
+    values.resize(size);
+    uint32_t valuesCount = 0;
+
+    for (int i = 0; i < YResiduals.rows; i++)
+    {
+        for (int j = 0; j < YResiduals.cols; j++)
+        {
+            values[valuesCount] = YResiduals.ptr<short>(i)[j];
+            valuesCount++;
         }
     }
 
-    //Predictor for V
-    for (int i = 0; i < VComponentReduced.rows; i++)
+    for (int i = 0; i < UReducedResiduals.rows; i++)
     {
-        pV = VComponentReduced.ptr<uchar>(i);
-        pVPred = VReducedPredictor.ptr<short>(i);
-        pVPred[0] = pV[0];
-        encoder.encodeNumber(pVPred[0]);
-        for (int j = 1; j < VComponentReduced.cols; j++)
+        for (int j = 0; j < UReducedResiduals.cols; j++)
         {
-            pVPred[j] = pV[j] - pV[j - 1];
-            pVPred[j] = pVPred[j] >> reduceV;
-            encoder.encodeNumber(pVPred[j]);
-            pV[j] = pV[j - 1] + (pVPred[j] << reduceV);
+            values[valuesCount] = UReducedResiduals.ptr<short>(i)[j];
+            valuesCount++;
         }
     }
+
+    for (int i = 0; i < VReducedResiduals.rows; i++)
+    {
+        for (int j = 0; j < VReducedResiduals.cols; j++)
+        {
+            values[valuesCount] = VReducedResiduals.ptr<short>(i)[j];
+            valuesCount++;
+        }
+    }
+
+    m = Golomb::getOtimizedM(values);
+
+    return m;
+}
+
+void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
+{
+    std::ofstream xAxisFile("../matlab/xAxis.txt");
+    std::ofstream YFrequencyFile("../matlab/YFrequency.txt");
+    std::ofstream UFrequencyFile("../matlab/UFrequency.txt");
+    std::ofstream VFrequencyFile("../matlab/VFrequency.txt");
+
+    for (int i = -255; i < 256; i++)
+    {
+        xAxisFile << i << std::endl;
+        YFrequencyFile << mapY[i] << std::endl;
+        UFrequencyFile << mapU[i] << std::endl;
+        VFrequencyFile << mapV[i] << std::endl;
+    }
+
+    YFrequencyFile.close();
+    UFrequencyFile.close();
+    VFrequencyFile.close();
 }

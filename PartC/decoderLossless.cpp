@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
     cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
 
-    reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+    reversePredictor1(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
 
     imwrite("YDecoded.png", YComponent);
 

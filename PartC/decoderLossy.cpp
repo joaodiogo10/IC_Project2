@@ -12,21 +12,21 @@ using namespace cv;
 */
 
 /**
-* \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original value based on this mode.
+* \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
 * It adds the previous pixel intensity to the current one. \n
 * In the case of the first column it considers the previous value to be zero. \n
 * \n
 * Each original value is saved in the respective Mat.
 * 
-* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
-* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
-* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 * \param[in] YResiduals \ref cv::Mat with the residuals of the Y component.
 * \param[in] UReducedResiduals \ref cv::Mat with the residuals of the U component.
 * \param[in] VReducedResiduals \ref cv::Mat with the residuals of the V component.
+* \param[in,out] YComponent \ref cv::Mat to store the values of Y.
+* \param[in,out] UComponentReduced \ref cv::Mat to store the sub-samples of U.
+* \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
-void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
+void reversePredictor1(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
 
 /**
 * \brief Main method of the lossy decoder.
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
     cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
 
-    reversePredictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+    reversePredictor1(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
 
     imwrite("YDecoded.png", YComponent);
 
@@ -137,38 +137,27 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void reversePredictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
+void reversePredictor1(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced)
 {
-
-    uchar *pY, *pU, *pV;
-    short *pYRes, *pURes, *pVRes;
-
     //Reverse predictor for Y
     for (int i = 0; i < YComponent.rows; i++)
     {
-        pY = YComponent.ptr<uchar>(i);
-        pYRes = YResiduals.ptr<short>(i);
-        pY[0] = pYRes[0];
+        YComponent.ptr<uchar>(i)[0] = YResiduals.ptr<short>(i)[0];
         for (int j = 1; j < YComponent.cols; j++)
         {
-            pY[j] = pYRes[j] + pY[j - 1];
+            YComponent.ptr<uchar>(i)[j] = YResiduals.ptr<short>(i)[j] + YComponent.ptr<uchar>(i)[j - 1];
         }
     }
 
     //Reverse predictor for U and V
     for (int i = 0; i < UComponentReduced.rows; i++)
     {
-        pU = UComponentReduced.ptr<uchar>(i);
-        pURes = UReducedResiduals.ptr<short>(i);
-        pV = VComponentReduced.ptr<uchar>(i);
-        pVRes = VReducedResiduals.ptr<short>(i);
-        pU[0] = pURes[0];
-        pV[0] = pVRes[0];
+        UComponentReduced.ptr<uchar>(i)[0] = UReducedResiduals.ptr<short>(i)[0];
+        VComponentReduced.ptr<uchar>(i)[0] = VReducedResiduals.ptr<short>(i)[0];
         for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            pU[j] = pURes[j] + pU[j - 1];
-
-            pV[j] = pVRes[j] + pV[j - 1];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedResiduals.ptr<short>(i)[j] + UComponentReduced.ptr<uchar>(i)[j - 1];
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedResiduals.ptr<short>(i)[j] + VComponentReduced.ptr<uchar>(i)[j - 1];
         }
     }
 }

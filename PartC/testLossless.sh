@@ -33,5 +33,12 @@ do
     mv V.png ../imageResults/lossless/${tmp}/
     mv UReduced.png ../imageResults/lossless/${tmp}/
     mv VReduced.png ../imageResults/lossless/${tmp}/
+
+    ./decoderLossless "../compressedResults/lossless/${tmp}";
+
+    mv YDecoded.png ../imageResults/lossless/${tmp}/
+    mv UReducedDecoded.png ../imageResults/lossless/${tmp}/
+    mv VReducedDecoded.png ../imageResults/lossless/${tmp}/
+
     
 done
