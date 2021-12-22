@@ -217,7 +217,7 @@ std::vector<double> calculateEntropyAndResidualHistograms(const std::vector<std:
         }
     }
 
-/*     const std::map<int,int> channel1Residuals = residualsMap[0];
+    const std::map<int,int> channel1Residuals = residualsMap[0];
     const std::map<int,int> channel2Residuals = residualsMap[1];
 
     std::ofstream channel1File( matlabDir + "/channel1.txt");
@@ -235,8 +235,9 @@ std::vector<double> calculateEntropyAndResidualHistograms(const std::vector<std:
 
     channel1File.close();
     channel2File.close();
- */
+
     return entropies;
+
 }
 
 std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth) {
