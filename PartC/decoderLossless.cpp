@@ -11,6 +11,9 @@ using namespace cv;
  *  Decoded images are saved in files. \n
 */
 
+void convertToRGB(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &BGR);
+void revert420(cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &UComponent, cv::Mat &VComponent);
+
 /**
 * \brief Reverse method for the first of the seven linear predictors of the lossless mode of JPEG. It calculates the original values based on this mode.
 * 
@@ -148,7 +151,81 @@ int main(int argc, char *argv[])
     imwrite("UReducedDecoded.png", UComponentReduced);
     imwrite("VReducedDecoded.png", VComponentReduced);
 
+    cv::Mat UComponent = cv::Mat::zeros(rows, cols, CV_8UC1);
+    cv::Mat VComponent = cv::Mat::zeros(rows, cols, CV_8UC1);
+
+    revert420(UComponentReduced, VComponentReduced, UComponent, VComponent);
+
+    cv::Mat BGR;
+
+    convertToRGB(YComponent, UComponent, VComponent, BGR);
+
+    cout << BGR << endl;
+
+    imwrite("RGBDecoded.png", BGR);
+
     return 0;
+}
+
+void convertToRGB(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &BGR)
+{
+
+    /*
+    R = 1.164 * Y             + 1.596 * V;
+    G = 1.164 * Y - 0.392 * U - 0.813 * V;
+    B = 1.164 * Y + 2.017 * U;
+    */
+
+    Mat channelR(YComponent.rows, YComponent.cols, CV_8UC1);
+    Mat channelG(YComponent.rows, YComponent.cols, CV_8UC1);
+    Mat channelB(YComponent.rows, YComponent.cols, CV_8UC1);
+
+    uchar *pY, *pU, *pV;
+    for (int i = 0; i < YComponent.rows; i++)
+    {
+        pY = YComponent.ptr<uchar>(i);
+        pU = UComponent.ptr<uchar>(i);
+        pV = VComponent.ptr<uchar>(i);
+        for (int j = 0; j < YComponent.cols; j++)
+        {
+            //bgr
+            channelR.ptr<uchar>(i)[j] = pY[j] + 1.403 * pV[j];
+            channelG.ptr<uchar>(i)[j] = pY[j] - 0.344 * pU[j] - 0.714 * pV[j];
+            channelB.ptr<uchar>(i)[j] = pY[j] + 1.770 * pU[j];
+        }
+    }
+
+    std::vector<Mat> channels{channelB, channelG, channelR};
+
+    // Create the output matrix
+    merge(channels, BGR);
+}
+
+void revert420(cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &UComponent, cv::Mat &VComponent)
+{
+    int nRows = UComponentReduced.rows;
+    int nCols = UComponentReduced.cols;
+
+    int countRow = 0;
+    int countColums = 0;
+
+    for (int i = 0; i < nRows; i++, countRow += 2)
+    {
+        countColums = 0;
+
+        for (int j = 0; j < nCols; j++, countColums += 2)
+        {
+            UComponent.ptr<uchar>(countRow)[countColums] = UComponentReduced.ptr<uchar>(i)[j];
+            UComponent.ptr<uchar>(countRow)[countColums + 1] = UComponentReduced.ptr<uchar>(i)[j];
+            UComponent.ptr<uchar>(countRow + 1)[countColums] = UComponentReduced.ptr<uchar>(i)[j];
+            UComponent.ptr<uchar>(countRow + 1)[countColums + 1] = UComponentReduced.ptr<uchar>(i)[j];
+
+            VComponent.ptr<uchar>(countRow)[countColums] = VComponentReduced.ptr<uchar>(i)[j];
+            VComponent.ptr<uchar>(countRow)[countColums + 1] = VComponentReduced.ptr<uchar>(i)[j];
+            VComponent.ptr<uchar>(countRow + 1)[countColums] = VComponentReduced.ptr<uchar>(i)[j];
+            VComponent.ptr<uchar>(countRow + 1)[countColums + 1] = VComponentReduced.ptr<uchar>(i)[j];
+        }
+    }
 }
 
 void reversePredictor1(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals, cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced)

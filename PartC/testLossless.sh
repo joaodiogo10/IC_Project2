@@ -39,6 +39,6 @@ do
     mv YDecoded.png ../imageResults/lossless/${tmp}/
     mv UReducedDecoded.png ../imageResults/lossless/${tmp}/
     mv VReducedDecoded.png ../imageResults/lossless/${tmp}/
+    mv RGBDecoded.png ../imageResults/lossless/${tmp}/
 
-    
 done
