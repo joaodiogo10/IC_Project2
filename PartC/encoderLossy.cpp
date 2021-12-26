@@ -145,7 +145,7 @@ void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<
 *
 * \param[in] ImageName Image to process.
 * \param[in] EncodedFile Name of the file to save the encoded image.
-* \param[in] PredictorMode Number of the desired predictor mode. 1 - a; 2 - b; 3 -c
+* \param[in] PredictorMode Number of the desired predictor mode. 1 - a; 2 - b; 3 - c; 6 - b + (a-c)/2
 * \param[in] NumberToReduceY Number os bits to reduce Y.
 * \param[in] NumberToReduceU Number of bits to reduce U.
 * \param[in] NumberToReduceV Number of bits to reduce V.

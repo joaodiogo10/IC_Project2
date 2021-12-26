@@ -38,5 +38,6 @@ do
     mv YDecoded.png ../imageResults/lossy/${tmp}/
     mv UReducedDecoded.png ../imageResults/lossy/${tmp}/
     mv VReducedDecoded.png ../imageResults/lossy/${tmp}/
+    mv RGBDecoded.png ../imageResults/lossy/${tmp}/
     
 done
