@@ -33,7 +33,7 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 /**
 * \brief Reduces YUV to YUV 4:2:0.
 * 
-* Removes odd rows and columns of the \p UComponent and \p VComponent chrominance components, producing a reduction in the data rate. \n
+* Removes odd rows and columns of the \p UComponent and \p VComponent chrominance components. \n
 * \n
 * Each value is saved in the respective Mat.
 * 
@@ -97,8 +97,11 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
 /**
-* \brief Fazer para esta.
+* \brief Method that returns "optimal" M golomb parameter for the value distribution given by residuals for YUV components.
 * 
+* \param YResiduals \ref cv::Mat with the residuals of Y.
+* \param UReducedResiduals \ref cv::Mat with the residuals of U.
+* \param VReducedResiduals \ref cv::Mat with the residuals of V.
 */
 uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 

@@ -187,9 +187,9 @@ void convertToRGB(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
 {
 
     /*
-    R = 1.164 * Y             + 1.596 * V;
-    G = 1.164 * Y - 0.392 * U - 0.813 * V;
-    B = 1.164 * Y + 2.017 * U;
+    R = 1.0 * Y                     + 1.400 * (V - 128);
+    G = 1.0 * Y - 0.343 * (U - 128) - 0.711 * (V - 128);
+    B = 1.0 * Y + 1.765 * (U - 128) ;
     */
 
     Mat channelR(YComponent.rows, YComponent.cols, CV_8UC1);
@@ -205,9 +205,9 @@ void convertToRGB(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
         for (int j = 0; j < YComponent.cols; j++)
         {
             //bgr
-            channelR.ptr<uchar>(i)[j] = pY[j] + 1.403 * pV[j];
-            channelG.ptr<uchar>(i)[j] = pY[j] - 0.344 * pU[j] - 0.714 * pV[j];
-            channelB.ptr<uchar>(i)[j] = pY[j] + 1.770 * pU[j];
+            channelR.ptr<uchar>(i)[j] = pY[j] +                         1.400 * (pV[j] - 128);
+            channelG.ptr<uchar>(i)[j] = pY[j] - 0.343 * (pU[j] - 128) - 0.711 * (pV[j] - 128);
+            channelB.ptr<uchar>(i)[j] = pY[j] + 1.765 * (pU[j] - 128);
         }
     }
 

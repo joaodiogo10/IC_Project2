@@ -115,8 +115,11 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
                 int reduceY, int reduceU, int reduceV);
 
 /**
-* \brief Fazer para esta.
+* \brief Method that returns "optimal" M golomb parameter for the value distribution given by residuals for YUV components.
 * 
+* \param YResiduals \ref cv::Mat with the residuals of Y.
+* \param UReducedResiduals \ref cv::Mat with the residuals of U.
+* \param VReducedResiduals \ref cv::Mat with the residuals of V.
 */
 uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
 
