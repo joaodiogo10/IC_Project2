@@ -8,9 +8,9 @@ using namespace cv;
 
 /** \file 
  *  Lossless encoder. \n
- *  Image transformations are saved in files. \n
- *  Frequency of residuals are written in files, under matlab/lossless/ImageName. \n
- *  File with the encoded information is written under results. \n
+ *  Image transformations are saved in files under imageResults/lossless/ImageName. \n
+ *  Frequency of residuals are written in files under matlab/lossless/ImageName. \n
+ *  File with the encoded information is written under compressedResults/lossless. \n
 */
 
 /**
@@ -109,9 +109,9 @@ uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &V
 * For each map, it saves a file with all the frequencies of the values between -255 and 255. \n
 * Namely YFrequence.txt, UFrequence.txt and VFrequence.txt. \n
 * 
-* \param[in] mapY \ref cv::Mat with the frequency of the residual values of Y.
-* \param[in] mapU \ref cv::Mat with the frequency of the residual values of the sub-sample of U.
-* \param[in] mapV \ref cv::Mat with the frequency of the residual values of the sub-sample of V.
+* \param[in] mapY Map with the frequency of the residual values of Y.
+* \param[in] mapU Map with the frequency of the residual values of the sub-sample of U.
+* \param[in] mapV Map with the frequency of the residual values of the sub-sample of V.
 */
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV);
 
@@ -120,14 +120,17 @@ void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<
 * 
 * Usage: ./encoderLossless ImageName EncodedFile \n
 *
-* \param[in] ImageName \ref Image to process.
-* \param[in] EncodedFile \ref Name of the file to save the encoded image.
+* It creates Y.png, U.png, V.png, UReduced.png, VReduced.png, xAxis.txt, YFrequency.txt, UFrequency.txt and VFrequency.txt.
+*
+* \param[in] ImageName Image to process.
+* \param[in] EncodedFile Name of the file to save the encoded image.
+* \param[in] PredictorMode Number of the desired predictor mode. 1 - a; 2 - b; 3 -c
 */
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        cout << "Usage: ./encoderLossless ImageName EncodedFile" << endl;
+        cout << "Usage: ./encoderLossless ImageName EncodedFile PredictorMode" << endl;
         return -1;
     }
 
@@ -171,7 +174,24 @@ int main(int argc, char *argv[])
     cv::Mat UReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
     cv::Mat VReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
-    predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+    int predictor;
+    std::istringstream myStringPredictor((string)argv[3]);
+    myStringPredictor >> predictor;
+
+    switch (predictor)
+    {
+    case 1:
+        predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+        break;
+    case 2:
+        predictor2(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+        break;
+    case 3:
+        predictor3(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals);
+        break;
+    default:
+        break;
+    }
 
     //Encode Header with fixed m = 400
     Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
@@ -187,6 +207,9 @@ int main(int argc, char *argv[])
 
     //encode columns
     encoder.encodeNumber(srcImage.cols);
+
+    //encode predictor mode
+    encoder.encodeNumber(predictor);
 
     //Change encoder m
     encoder.setM(m);

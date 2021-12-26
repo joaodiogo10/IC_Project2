@@ -16,7 +16,7 @@ do
 	tmp=`echo ${img} | cut -d '.' -f 1`;
  	
     echo "Image: ${img}"
-	./encoderLossy "../imageSamples/${img}" "../compressedResults/lossy/${tmp}" 4 4 4;
+	./encoderLossy "../imageSamples/${img}" "../compressedResults/lossy/${tmp}" 3 5 5 5;
     echo '\n'
 
     [ ! -d "../matlab/lossy/${tmp}" ] && mkdir ../matlab/lossy/${tmp}

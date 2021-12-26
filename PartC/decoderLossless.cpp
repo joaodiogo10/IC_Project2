@@ -70,7 +70,9 @@ void reversePredictor3(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat 
 * 
 * Usage: ./decoderLossless EncodedFile \n
 *
-* \param[in] EncodedFile \ref Name of the file to where the encoded image is saved.
+* It creates YDecoded.png, UReducedDecoded.png and VReducedDecoded.png.
+*
+* \param[in] EncodedFile Name of the file to where the encoded image is saved.
 */
 int main(int argc, char *argv[])
 {
@@ -80,7 +82,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    int32_t m, rows, cols;
+    int32_t m, rows, cols, predictor;
 
     //Decode header with fixed m = 400
     Golomb decoder((string)argv[1], BitStream::bs_mode::read, 400);
@@ -88,6 +90,7 @@ int main(int argc, char *argv[])
     m = decoder.decodeNumber();
     rows = decoder.decodeNumber();
     cols = decoder.decodeNumber();
+    predictor = decoder.decodeNumber();
 
     int halfRows = rows / 2;
     int halfCols = cols / 2;
@@ -144,7 +147,20 @@ int main(int argc, char *argv[])
     cv::Mat UComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
     cv::Mat VComponentReduced = cv::Mat::zeros(halfRows, halfCols, CV_8UC1);
 
-    reversePredictor1(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
+    switch (predictor)
+    {
+    case 1:
+        reversePredictor1(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
+        break;
+    case 2:
+        reversePredictor2(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
+        break;
+    case 3:
+        reversePredictor3(YResiduals, UReducedResiduals, VReducedResiduals, YComponent, UComponentReduced, VComponentReduced);
+        break;
+    default:
+        break;
+    }
 
     imwrite("YDecoded.png", YComponent);
 
@@ -160,7 +176,7 @@ int main(int argc, char *argv[])
 
     convertToRGB(YComponent, UComponent, VComponent, BGR);
 
-    cout << BGR << endl;
+    //cout << BGR << endl;
 
     imwrite("RGBDecoded.png", BGR);
 

@@ -8,9 +8,9 @@ using namespace cv;
 
 /** \file 
  *  Lossy encoder. \n
- *  Image transformations are saved in files. \n
- *  Frequency of residuals are written in files, under matlab/lossy/ImageName. \n
- *  File with the encoded information is written under results. \n
+ *  Image transformations are saved in files under imageResults/lossy/ImageName. \n
+ *  Frequency of residuals are written in files under matlab/lossy/ImageName. \n
+ *  File with the encoded information is written under compressedResults/lossy. \n
 */
 
 /**
@@ -44,9 +44,93 @@ void convertToYUV(const cv::Mat &source, cv::Mat &YComponent, cv::Mat &UComponen
 * \param[in,out] VComponentReduced \ref cv::Mat to store the sub-samples of V.
 */
 void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced);
+
+/**
+* \brief First of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
+* 
+* It subtracts the previous pixel intensity from the current one. \n
+* In the case of the first column it considers the previous value to be zero. \n
+* It shifts the residuals according with the entrance parameter. \n
+* It corrects the current pixel of the original mat to prevent the accumulation of erros in decoding. \n
+* 
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
+* \param[in] reduceY Number of bits to reduce Y.
+* \param[in] reduceU Number of bits to reduce U.
+* \param[in] reduceV Number of bits to reduce V.
+*/
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
                 int reduceY, int reduceU, int reduceV);
+/**
+* \brief Second of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
+* 
+* It subtracts the above pixel intensity from the current one. \n
+* In the case of the first row it considers the above value to be zero. \n
+* It shifts the residuals according with the entrance parameter. \n
+* It corrects the current pixel of the original mat to prevent the accumulation of erros in decoding. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
+* \param[in] reduceY Number of bits to reduce Y.
+* \param[in] reduceU Number of bits to reduce U.
+* \param[in] reduceV Number of bits to reduce V.
+*/
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV);
+
+/**
+* \brief Third of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
+* 
+* It subtracts the top left diagonal pixel intensity from the current one. \n
+* In the case of the first row and first column it considers the top left diagonal value to be zero. \n
+* It shifts the residuals according with the entrance parameter. \n
+* It corrects the current pixel of the original mat to prevent the accumulation of erros in decoding. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
+* \param[in] reduceY Number of bits to reduce Y.
+* \param[in] reduceU Number of bits to reduce U.
+* \param[in] reduceV Number of bits to reduce V.
+*/
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV);
+
+/**
+* \brief Fazer para esta.
+* 
+*/
 uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals);
+
+/**
+* \brief Method to save the frequency of the residual values of the components in files to further calculate the histograms.
+* 
+* It saves a file with the values to the xAxis, from -255 to 255, named xAxis.txt. \n
+* For each map, it saves a file with all the frequencies of the values between -255 and 255. \n
+* Namely YFrequence.txt, UFrequence.txt and VFrequence.txt. \n
+* 
+* \param[in] mapY Map with the frequency of the residual values of Y.
+* \param[in] mapU Map with the frequency of the residual values of the sub-sample of U.
+* \param[in] mapV Map with the frequency of the residual values of the sub-sample of V.
+*/
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV);
 
 /**
@@ -54,17 +138,20 @@ void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<
 * 
 * Usage: ./encoderLossless ImageName EncodedFile NumberToReduceY NumberToReduceU NumberToReduceV \n
 *
-* \param[in] ImageName \ref Image to process.
-* \param[in] EncodedFile \ref Name of the file to save the encoded image.
-* \param[in] NumberToReduceY \ref Number os bits to reduce Y.
-* \param[in] NumberToReduceU \ref Number of bits to reduce U.
-* \param[in] NumberToReduceV \ref Number of bits to reduce V.
+* It creates Y.png, U.png, V.png, UReduced.png, VReduced.png, xAxis.txt, YFrequency.txt, UFrequency.txt and VFrequency.txt
+*
+* \param[in] ImageName Image to process.
+* \param[in] EncodedFile Name of the file to save the encoded image.
+* \param[in] PredictorMode Number of the desired predictor mode. 1 - a; 2 - b; 3 -c
+* \param[in] NumberToReduceY Number os bits to reduce Y.
+* \param[in] NumberToReduceU Number of bits to reduce U.
+* \param[in] NumberToReduceV Number of bits to reduce V.
 */
 int main(int argc, char *argv[])
 {
     if (argc < 6)
     {
-        cout << "Usage: ./encoderLossy ImageName EncodedFile NumberToReduceY NumberToReduceU NumberToReduceV" << endl;
+        cout << "Usage: ./encoderLossy ImageName EncodedFile PredictorMode NumberToReduceY NumberToReduceU NumberToReduceV" << endl;
         return -1;
     }
 
@@ -114,16 +201,31 @@ int main(int argc, char *argv[])
     cv::Mat UReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
     cv::Mat VReducedResiduals = cv::Mat::zeros(halfRows, halfCols, CV_32SC1);
 
-    int reduceY, reduceU, reduceV;
+    int reduceY, reduceU, reduceV, predictor;
 
-    std::istringstream myStringY((string)argv[3]);
+    std::istringstream myStringPredictor((string)argv[3]);
+    myStringPredictor >> predictor;
+    std::istringstream myStringY((string)argv[4]);
     myStringY >> reduceY;
-    std::istringstream myStringU((string)argv[4]);
+    std::istringstream myStringU((string)argv[5]);
     myStringU >> reduceU;
-    std::istringstream myStringV((string)argv[5]);
+    std::istringstream myStringV((string)argv[6]);
     myStringV >> reduceV;
 
-    predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
+    switch (predictor)
+    {
+    case 1:
+        predictor1(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
+        break;
+    case 2:
+        predictor2(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
+        break;
+    case 3:
+        predictor3(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
+        break;
+    default:
+        break;
+    }
 
     //Encode Header with fixed m = 400
     Golomb encoder((string)argv[2], BitStream::bs_mode::write, 400);
@@ -139,6 +241,9 @@ int main(int argc, char *argv[])
 
     //encode columns
     encoder.encodeNumber(srcImage.cols);
+
+    //encode predictor mode
+    encoder.encodeNumber(predictor);
 
     //encode reduceY
     encoder.encodeNumber(reduceY);
@@ -336,6 +441,100 @@ void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
             VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i)[j - 1];
             VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
             VComponentReduced.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i)[j - 1] + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
+        }
+    }
+}
+
+void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV)
+{
+    //Residuals for Y
+    //first row, Predictor = 0
+    for (int i = 0; i < YComponent.rows; i++)
+    {
+        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+    }
+    //Remaining rows, Predictor = b
+    for (int i = 1; i < YComponent.rows; i++)
+    {
+        for (int j = 0; j < YComponent.cols; j++)
+        {
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j];
+            YResiduals.ptr<short>(i)[j] = YResiduals.ptr<short>(i)[j] >> reduceY;
+            YComponent.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i - 1)[j] + (YResiduals.ptr<short>(i)[j] << reduceY);
+        }
+    }
+
+    //Residuals for U and V
+    //first row, Predictor = 0
+    for (int i = 0; i < UComponentReduced.rows; i++)
+    {
+        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+    }
+
+    //Remaining rows, Predictor = b
+    for (int i = 1; i < UComponentReduced.rows; i++)
+    {
+        for (int j = 0; j < UComponentReduced.cols; j++)
+        {
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j];
+            UReducedResiduals.ptr<short>(i)[j] = UReducedResiduals.ptr<short>(i)[j] >> reduceU;
+            UComponentReduced.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i - 1)[j] + (UReducedResiduals.ptr<short>(i)[j] << reduceU);
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j];
+            VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
+            VComponentReduced.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i - 1)[j] + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
+        }
+    }
+}
+
+void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV)
+{
+    //Residuals for Y
+    //first row, Predictor = 0
+    for (int i = 0; i < YComponent.rows; i++)
+    {
+        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+    }
+
+    for (int i = 1; i < YComponent.rows; i++)
+    {
+        //first column predictor = 0
+        YResiduals.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0];
+
+        //Remaining columns, Predictor = c
+        for (int j = 1; j < YComponent.cols; j++)
+        {
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - YComponent.ptr<uchar>(i - 1)[j - 1];
+            YResiduals.ptr<short>(i)[j] = YResiduals.ptr<short>(i)[j] >> reduceY;
+            YComponent.ptr<uchar>(i)[j] = YComponent.ptr<uchar>(i - 1)[j - 1] + (YResiduals.ptr<short>(i)[j] << reduceY);
+        }
+    }
+
+    //Residuals for U and V
+    //first row, Predictor = 0
+    for (int i = 0; i < UComponentReduced.rows; i++)
+    {
+        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
+        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+    }
+
+    for (int i = 1; i < UComponentReduced.rows; i++)
+    {
+        //first column predictor = 0
+        UReducedResiduals.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0];
+        VReducedResiduals.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0];
+
+        //Remaining columns, Predictor = c
+        for (int j = 0; j < UComponentReduced.cols; j++)
+        {
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - UComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            UReducedResiduals.ptr<short>(i)[j] = UReducedResiduals.ptr<short>(i)[j] >> reduceU;
+            UComponentReduced.ptr<uchar>(i)[j] = UComponentReduced.ptr<uchar>(i - 1)[j - 1] + (UReducedResiduals.ptr<short>(i)[j] << reduceU);
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
+            VComponentReduced.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i - 1)[j - 1] + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
         }
     }
 }
