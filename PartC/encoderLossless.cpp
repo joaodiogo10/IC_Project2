@@ -397,8 +397,29 @@ void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent,
             pVReduced[countColums] = pV[j];
         }
     }
-}
+} 
 
+/* void convertTo420(cv::Mat &YComponent, cv::Mat &UComponent, cv::Mat &VComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced)
+{
+    int nRows = YComponent.rows;
+    int nCols = YComponent.cols;
+
+    int countRow = 0;
+    int countColums = 0;
+
+    //Removes odd rows and columns
+    for (int i = 1; i < nRows; i += 2, countRow++)
+    {
+        countColums = 0;
+        for (int j = 1; j < nCols; j += 2, countColums++)
+        {
+            uchar meanU = (UComponent.ptr<uchar>(i-1)[j-1] + UComponent.ptr<uchar>(i-1)[j] + UComponent.ptr<uchar>(i)[j-1] + UComponent.ptr<uchar>(i)[j]) / 4;
+            uchar meanV = (VComponent.ptr<uchar>(i-1)[j-1] + VComponent.ptr<uchar>(i-1)[j] + VComponent.ptr<uchar>(i)[j-1] + VComponent.ptr<uchar>(i)[j]) / 4;
+            UComponentReduced.ptr<uchar>(countRow)[countColums] = meanU;
+            VComponentReduced.ptr<uchar>(countRow)[countColums] = meanV;
+        }
+    }
+} */
 void predictor1(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals)
 {
     //Residuals for Y
@@ -523,9 +544,9 @@ void predictor6(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     }
 
     //Remaining
-    for (int i = 2; i < YComponent.rows; i++)
+    for (int i = 1; i < YComponent.rows; i++)
     {
-        for (int j = 2; j < YComponent.cols; j++)
+        for (int j = 1; j < YComponent.cols; j++)
         {
             YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - (YComponent.ptr<uchar>(i - 1)[j] + (YComponent.ptr<uchar>(i)[j - 1] - YComponent.ptr<uchar>(i - 1)[j - 1]) / 2);
         }
@@ -551,9 +572,9 @@ void predictor6(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
     }
 
     //Remaining
-    for (int i = 2; i < UComponentReduced.rows; i++)
+    for (int i = 1; i < UComponentReduced.rows; i++)
     {
-        for (int j = 2; j < UComponentReduced.cols; j++)
+        for (int j = 1; j < UComponentReduced.cols; j++)
         {
             UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - (UComponentReduced.ptr<uchar>(i - 1)[j] + (UComponentReduced.ptr<uchar>(i)[j - 1] - UComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);
             VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - (VComponentReduced.ptr<uchar>(i - 1)[j] + (VComponentReduced.ptr<uchar>(i)[j - 1] - VComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);

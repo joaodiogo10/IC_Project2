@@ -412,11 +412,11 @@ void reversePredictor6(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat 
     }
 
     //Remaining
-    for (int i = 2; i < YComponent.rows; i++)
+    for (int i = 1; i < YComponent.rows; i++)
     {
-        for (int j = 2; j < YComponent.cols; j++)
+        for (int j = 1; j < YComponent.cols; j++)
         {
-            YComponent.ptr<uchar>(i)[j] = (YResiduals.ptr<short>(i)[j] + YComponent.ptr<uchar>(i - 1)[j]) * (-2) - YComponent.ptr<uchar>(i)[j - 1] + YComponent.ptr<uchar>(i - 1)[j - 1];
+            YComponent.ptr<uchar>(i)[j] = YResiduals.ptr<short>(i)[j] + (YComponent.ptr<uchar>(i - 1)[j] + (YComponent.ptr<uchar>(i)[j - 1] - YComponent.ptr<uchar>(i - 1)[j - 1]) / 2);
         }
     }
 
@@ -438,12 +438,12 @@ void reversePredictor6(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat 
     }
 
     //Remaining
-    for (int i = 2; i < UComponentReduced.rows; i++)
+    for (int i = 1; i < UComponentReduced.rows; i++)
     {
-        for (int j = 2; j < UComponentReduced.cols; j++)
+        for (int j = 1; j < UComponentReduced.cols; j++)
         {
-            UComponentReduced.ptr<uchar>(i)[j] = (UReducedResiduals.ptr<short>(i)[j] + UComponentReduced.ptr<uchar>(i - 1)[j]) * (-2) - UComponentReduced.ptr<uchar>(i)[j - 1] + UComponentReduced.ptr<uchar>(i - 1)[j - 1];
-            VComponentReduced.ptr<uchar>(i)[j] = (VReducedResiduals.ptr<short>(i)[j] + VComponentReduced.ptr<uchar>(i - 1)[j]) * (-2) - VComponentReduced.ptr<uchar>(i)[j - 1] + VComponentReduced.ptr<uchar>(i - 1)[j - 1];
+            UComponentReduced.ptr<uchar>(i)[j] = UReducedResiduals.ptr<short>(i)[j] + (UComponentReduced.ptr<uchar>(i - 1)[j] + (UComponentReduced.ptr<uchar>(i)[j - 1] - UComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);
+            VComponentReduced.ptr<uchar>(i)[j] = VReducedResiduals.ptr<short>(i)[j] + (VComponentReduced.ptr<uchar>(i - 1)[j] + (VComponentReduced.ptr<uchar>(i)[j - 1] - VComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);
         }
     }
 }
