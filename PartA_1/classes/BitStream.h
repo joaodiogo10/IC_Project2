@@ -60,8 +60,7 @@ public:
     /**
         * \brief Read N bits from BitStream.
         * 
-        * All bytes of the array are written in a little endian fashion.
-        * If \p nBits < 8, the reaminder bits are written to the first \"\p nBits % 8\" LSBs in little endian.
+        * If \p nBits < 8, the reaminder bits are written to the first \"\p nBits % 8\" LSBs.
         * 
         * Ex: \n Next bits of file stream = 1010 0000 1010 1111 \n nBits = 12.
         * 
