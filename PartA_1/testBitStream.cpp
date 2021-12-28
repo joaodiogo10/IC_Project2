@@ -20,11 +20,19 @@ void testWriteBit(char c, BitStream &oStream);
  * #: c     - read don't match expected value\n 
  * </pre>
  */
-void testReadNBits();
+void test1();
 /**
- * \brief Test \ref BitStream::writeNBits 
+ * \brief Test \ref BitStream::writeNBits and BitStream::readNBits
+ * 
+ * Results are printed to the console. Printed character or decimal values should match, if not something went wrong.\n
+ * 
+ * <pre>
+ * Ex:\n
+ * #: #     - read expected value\n 
+ * #: c     - read don't match expected value\n 
+ * </pre>
  */
-void testWriteNBits();
+void test2();
 
 std::string test1File = "testBitStream1.txt"; /*!< first test file */
 std::string test2File = "testBitStream2.txt"; /*!< second test file */
@@ -45,11 +53,11 @@ int main(int argc, char *argv[])
 
     oStream.close();
 
-    testReadNBits();
+    test1();
 
     //----------Test 2---------
     //-------------------------
-    testWriteNBits();
+    test2();
    
     return 0;
 }
@@ -66,8 +74,8 @@ void testWriteBit(char c, BitStream &oStream) {
     oStream.writeBit(c & 0x01);
 }
 
-void testReadNBits() {
-    std::cout << "-------Test ReadNBits -------" << std::endl;
+void test1() {
+    std::cout << "-------Test 1-------" << std::endl;
     // file content
     // 0010 0011 #
     // 0110 0011 c
@@ -206,23 +214,27 @@ void testReadNBits() {
     iStream.close();
 }
 
-void testWriteNBits() {
-    std::cout << "-------Test WriteNBits -------" << std::endl;
+void test2() {
+    std::cout << "-------Test 2-------" << std::endl;
     BitStream oStream(test2File, BitStream::bs_mode::write);
 
-    // 0001 0100
-    // 0001
-    // 0001 1001
+    // 0001 0100    20 
+    // 0001         01
+    // 0001 1001    25
+    // 0000 0111    07
+    // 0111 0111    119
 
-    //0001 0100
     unsigned char number = 20;
 
     oStream.writeNBits(&number, 8);
 
     number = 25;
-    //0001 1001
+
     oStream.writeNBits(&number, 4);
     oStream.writeNBits(&number, 8);
+
+    unsigned char numbers[2] = {7 , 119};
+    oStream.writeNBits(numbers, 16);
 
     oStream.close();
 
@@ -230,17 +242,27 @@ void testWriteNBits() {
 
     u_char input;
     //Read 8 bits, result should be  input = 0001 0100 (20 decimal)
-    std::cout << "\n"
-              << "Testing results of writing N bits" << std::endl;
     iStream.readNBits(&input, 8);
 
-    std::cout << (u_int)input << std::endl;
+    std::cout << "20: " << (u_int)input << std::endl;
 
     //Read 4 bits, result should be  input = 0001 (1 decimal)
     iStream.readNBits(&input, 4);
 
-    std::cout << "\n"
-              << (u_int)input << std::endl;
+    std::cout << "1: " << (u_int)input << std::endl;
+
+    //Read 8 bits, result should be  input = 0001 1001 (25 decimal)
+    iStream.readNBits(&input, 8);
+
+    std::cout << "25: " << (u_int)input << std::endl;
+
+
+    unsigned char input2[2];
+    //Read 16 bits, result should be  input2[0] = 0000 0111  (7 decimal); input2[1] = 0111 0111 ( 119 decimal )
+    iStream.readNBits(input2, 16);
+
+    std::cout << "7: " << (u_int)input2[0] << std::endl;
+    std::cout << "119: " << (u_int)input2[1] << std::endl;
 
 }
 
