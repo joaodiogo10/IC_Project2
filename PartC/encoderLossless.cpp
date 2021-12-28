@@ -99,7 +99,7 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 /**
 * \brief Sixth of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
-* It follows the expression: x = y - (b + (a - c)/2)
+* It follows the expression: x = y - (b + (a - c)/2) \n
 * \n
 * Each residual value is saved in the respective Mat.
 * 

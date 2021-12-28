@@ -115,6 +115,28 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
                 int reduceY, int reduceU, int reduceV);
 
 /**
+* \brief Sixth of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
+* 
+* It follows the expression: x = y - (b + (a - c)/2) \n
+* It shifts the residuals according with the entrance parameter. \n
+* It corrects the current pixel of the original mat to prevent the accumulation of erros in decoding. \n
+* \n
+* Each residual value is saved in the respective Mat.
+* 
+* \param[in] YComponent \ref cv::Mat with the values of Y.
+* \param[in] UComponentReduced \ref cv::Mat with the sub-samples of U.
+* \param[in] VComponentReduced \ref cv::Mat with the sub-samples of V.
+* \param[in,out] YResiduals \ref cv::Mat to store the residuals of the Y component.
+* \param[in,out] UReducedResiduals \ref cv::Mat to store the residuals of the U component.
+* \param[in,out] VReducedResiduals \ref cv::Mat to store the residuals of the V component.
+* \param[in] reduceY Number of bits to reduce Y.
+* \param[in] reduceU Number of bits to reduce U.
+* \param[in] reduceV Number of bits to reduce V.
+*/
+void predictor6(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV);
+
+/**
 * \brief Method that returns "optimal" M golomb parameter for the value distribution given by residuals for YUV components.
 * 
 * \param YResiduals \ref cv::Mat with the residuals of Y.
@@ -225,6 +247,9 @@ int main(int argc, char *argv[])
         break;
     case 3:
         predictor3(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
+        break;
+    case 6:
+        predictor6(YComponent, UComponentReduced, VComponentReduced, YResiduals, UReducedResiduals, VReducedResiduals, reduceY, reduceU, reduceV);
         break;
     default:
         break;
@@ -538,6 +563,82 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
             VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - VComponentReduced.ptr<uchar>(i - 1)[j - 1];
             VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
             VComponentReduced.ptr<uchar>(i)[j] = VComponentReduced.ptr<uchar>(i - 1)[j - 1] + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
+        }
+    }
+}
+
+void predictor6(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VComponentReduced, cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &VReducedResiduals,
+                int reduceY, int reduceU, int reduceV)
+{
+    //Residuals for Y
+    //a = 0, b = 0, c = 0
+    YResiduals.ptr<short>(0)[0] = YComponent.ptr<uchar>(0)[0];
+
+    //First column, a = 0, c = 0
+    for (int i = 1; i < YComponent.rows; i++)
+    {
+        YResiduals.ptr<short>(i)[0] = YComponent.ptr<uchar>(i)[0] - YComponent.ptr<uchar>(i - 1)[0];
+        YResiduals.ptr<short>(i)[0] = YResiduals.ptr<short>(i)[0] >> reduceY;
+        YComponent.ptr<uchar>(i)[0] = YComponent.ptr<uchar>(i - 1)[0] + (YResiduals.ptr<short>(i)[0] << reduceY);
+    }
+
+    //First row, b = 0, c = 0
+    for (int j = 1; j < YComponent.cols; j++)
+    {
+        YResiduals.ptr<short>(0)[j] = YComponent.ptr<uchar>(0)[j] - YComponent.ptr<uchar>(0)[j - 1];
+        YResiduals.ptr<short>(0)[j] = YResiduals.ptr<short>(0)[j] >> reduceY;
+        YComponent.ptr<uchar>(0)[j] = YComponent.ptr<uchar>(0)[j - 1] + (YResiduals.ptr<short>(0)[j] << reduceY);
+    }
+
+    //Remaining
+    for (int i = 1; i < YComponent.rows; i++)
+    {
+        for (int j = 1; j < YComponent.cols; j++)
+        {
+            YResiduals.ptr<short>(i)[j] = YComponent.ptr<uchar>(i)[j] - (YComponent.ptr<uchar>(i - 1)[j] + (YComponent.ptr<uchar>(i)[j - 1] - YComponent.ptr<uchar>(i - 1)[j - 1]) / 2);
+            YResiduals.ptr<short>(i)[j] = YResiduals.ptr<short>(i)[j] >> reduceY;
+            YComponent.ptr<uchar>(i)[j] = (YComponent.ptr<uchar>(i - 1)[j] + (YComponent.ptr<uchar>(i)[j - 1] - YComponent.ptr<uchar>(i - 1)[j - 1]) / 2) + (YResiduals.ptr<short>(i)[j] << reduceY);
+        }
+    }
+
+    //Residuals for U and V
+    //a = 0, b = 0, c = 0
+    UReducedResiduals.ptr<short>(0)[0] = UComponentReduced.ptr<uchar>(0)[0];
+    VReducedResiduals.ptr<short>(0)[0] = VComponentReduced.ptr<uchar>(0)[0];
+
+    //First column, a = 0, c = 0
+    for (int i = 1; i < UComponentReduced.rows; i++)
+    {
+        UReducedResiduals.ptr<short>(i)[0] = UComponentReduced.ptr<uchar>(i)[0] - UComponentReduced.ptr<uchar>(i - 1)[0];
+        UReducedResiduals.ptr<short>(i)[0] = UReducedResiduals.ptr<short>(i)[0] >> reduceU;
+        UComponentReduced.ptr<uchar>(i)[0] = UComponentReduced.ptr<uchar>(i - 1)[0] + (UReducedResiduals.ptr<short>(i)[0] << reduceU);
+        VReducedResiduals.ptr<short>(i)[0] = VComponentReduced.ptr<uchar>(i)[0] - VComponentReduced.ptr<uchar>(i - 1)[0];
+        VReducedResiduals.ptr<short>(i)[0] = VReducedResiduals.ptr<short>(i)[0] >> reduceV;
+        VComponentReduced.ptr<uchar>(i)[0] = VComponentReduced.ptr<uchar>(i - 1)[0] + (VReducedResiduals.ptr<short>(i)[0] << reduceV);
+    }
+
+    //First row, b = 0, c = 0
+    for (int j = 1; j < UComponentReduced.cols; j++)
+    {
+        UReducedResiduals.ptr<short>(0)[j] = UComponentReduced.ptr<uchar>(0)[j] - UComponentReduced.ptr<uchar>(0)[j - 1];
+        UReducedResiduals.ptr<short>(0)[j] = UReducedResiduals.ptr<short>(0)[j] >> reduceU;
+        UComponentReduced.ptr<uchar>(0)[j] = UComponentReduced.ptr<uchar>(0)[j - 1] + (UReducedResiduals.ptr<short>(0)[j] << reduceU);
+        VReducedResiduals.ptr<short>(0)[j] = VComponentReduced.ptr<uchar>(0)[j] - VComponentReduced.ptr<uchar>(0)[j - 1];
+        VReducedResiduals.ptr<short>(0)[j] = VReducedResiduals.ptr<short>(0)[j] >> reduceV;
+        VComponentReduced.ptr<uchar>(0)[j] = VComponentReduced.ptr<uchar>(0)[j - 1] + (VReducedResiduals.ptr<short>(0)[j] << reduceV);
+    }
+
+    //Remaining
+    for (int i = 1; i < UComponentReduced.rows; i++)
+    {
+        for (int j = 1; j < UComponentReduced.cols; j++)
+        {
+            UReducedResiduals.ptr<short>(i)[j] = UComponentReduced.ptr<uchar>(i)[j] - (UComponentReduced.ptr<uchar>(i - 1)[j] + (UComponentReduced.ptr<uchar>(i)[j - 1] - UComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);
+            UReducedResiduals.ptr<short>(i)[j] = UReducedResiduals.ptr<short>(i)[j] >> reduceU;
+            UComponentReduced.ptr<uchar>(i)[j] = (UComponentReduced.ptr<uchar>(i - 1)[j] + (UComponentReduced.ptr<uchar>(i)[j - 1] - UComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2) + (UReducedResiduals.ptr<short>(i)[j] << reduceU);
+            VReducedResiduals.ptr<short>(i)[j] = VComponentReduced.ptr<uchar>(i)[j] - (VComponentReduced.ptr<uchar>(i - 1)[j] + (VComponentReduced.ptr<uchar>(i)[j - 1] - VComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2);
+            VReducedResiduals.ptr<short>(i)[j] = VReducedResiduals.ptr<short>(i)[j] >> reduceV;
+            VComponentReduced.ptr<uchar>(i)[j] = (VComponentReduced.ptr<uchar>(i - 1)[j] + (VComponentReduced.ptr<uchar>(i)[j - 1] - VComponentReduced.ptr<uchar>(i - 1)[j - 1]) / 2) + (VReducedResiduals.ptr<short>(i)[j] << reduceV);
         }
     }
 }
