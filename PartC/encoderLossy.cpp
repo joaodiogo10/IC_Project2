@@ -453,9 +453,9 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 {
     //Residuals for Y
     //first row, Predictor = 0
-    for (int i = 0; i < YComponent.rows; i++)
+    for (int j = 0; j < YComponent.cols; j++)
     {
-        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+        YResiduals.ptr<short>(0)[j] = YComponent.ptr<uchar>(0)[j];
     }
     //Remaining rows, Predictor = b
     for (int i = 1; i < YComponent.rows; i++)
@@ -470,10 +470,10 @@ void predictor2(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 
     //Residuals for U and V
     //first row, Predictor = 0
-    for (int i = 0; i < UComponentReduced.rows; i++)
+    for (int j = 0; j < UComponentReduced.cols; j++)
     {
-        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
-        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+        UReducedResiduals.ptr<short>(0)[j] = UComponentReduced.ptr<uchar>(0)[j];
+        VReducedResiduals.ptr<short>(0)[j] = VComponentReduced.ptr<uchar>(0)[j];
     }
 
     //Remaining rows, Predictor = b
@@ -496,9 +496,9 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 {
     //Residuals for Y
     //first row, Predictor = 0
-    for (int i = 0; i < YComponent.rows; i++)
+    for (int j = 0; j < YComponent.cols; j++)
     {
-        YResiduals.ptr<short>(0)[i] = YComponent.ptr<uchar>(0)[i];
+        YResiduals.ptr<short>(0)[j] = YComponent.ptr<uchar>(0)[j];
     }
 
     for (int i = 1; i < YComponent.rows; i++)
@@ -517,10 +517,10 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 
     //Residuals for U and V
     //first row, Predictor = 0
-    for (int i = 0; i < UComponentReduced.rows; i++)
+    for (int j = 0; j < UComponentReduced.cols; j++)
     {
-        UReducedResiduals.ptr<short>(0)[i] = UComponentReduced.ptr<uchar>(0)[i];
-        VReducedResiduals.ptr<short>(0)[i] = VComponentReduced.ptr<uchar>(0)[i];
+        UReducedResiduals.ptr<short>(0)[j] = UComponentReduced.ptr<uchar>(0)[j];
+        VReducedResiduals.ptr<short>(0)[j] = VComponentReduced.ptr<uchar>(0)[j];
     }
 
     for (int i = 1; i < UComponentReduced.rows; i++)
