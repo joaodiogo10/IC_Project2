@@ -16,17 +16,17 @@ do
 	tmp=`echo ${img} | cut -d '.' -f 1`;
  	
     echo "Image: ${img}"
-	./encoderLossless "../imageSamples/${img}" "../compressedResults/lossless/${tmp}" 2;
+	./encoderLossless "../imageSamples/${img}" "../compressedResults/lossless/${tmp}" 6;
     echo '\n'
 
     [ ! -d "../matlab/lossless/${tmp}" ] && mkdir ../matlab/lossless/${tmp}
     [ ! -d "../imageResults/lossless/${tmp}" ] && mkdir ../imageResults/lossless/${tmp}
 
 
-    mv ../matlab/xAxis.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/YFrequency.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/UFrequency.txt ../matlab/lossless/${tmp}/
-    mv ../matlab/VFrequency.txt ../matlab/lossless/${tmp}/
+    mv xAxis.txt ../matlab/lossless/${tmp}/
+    mv YFrequency.txt ../matlab/lossless/${tmp}/
+    mv UFrequency.txt ../matlab/lossless/${tmp}/
+    mv VFrequency.txt ../matlab/lossless/${tmp}/
 
     mv Y.png ../imageResults/lossless/${tmp}/
     mv U.png ../imageResults/lossless/${tmp}/

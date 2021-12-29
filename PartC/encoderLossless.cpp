@@ -8,9 +8,9 @@ using namespace cv;
 
 /** \file 
  *  Lossless encoder. \n
- *  Image transformations are saved in files under imageResults/lossless/ImageName. \n
- *  Frequency of residuals are written in files under matlab/lossless/ImageName. \n
- *  File with the encoded information is written under compressedResults/lossless. \n
+ *  Image transformations are saved in files. \n
+ *  Frequency of residuals are written in files. \n
+ *  File with the encoded information is written. \n
 */
 
 /**
@@ -99,7 +99,7 @@ void predictor3(cv::Mat &YComponent, cv::Mat &UComponentReduced, cv::Mat &VCompo
 /**
 * \brief Sixth of the seven linear predictors of the lossless mode of JPEG. It calculates the residuals based on this mode.
 * 
-* It follows the expression: x = y - (b + (a - c)/2)
+* It follows the expression: x = y - (b + (a - c)/2) \n
 * \n
 * Each residual value is saved in the respective Mat.
 * 
@@ -625,10 +625,10 @@ uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &V
 
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
 {
-    std::ofstream xAxisFile("../matlab/xAxis.txt");
-    std::ofstream YFrequencyFile("../matlab/YFrequency.txt");
-    std::ofstream UFrequencyFile("../matlab/UFrequency.txt");
-    std::ofstream VFrequencyFile("../matlab/VFrequency.txt");
+    std::ofstream xAxisFile("xAxis.txt");
+    std::ofstream YFrequencyFile("YFrequency.txt");
+    std::ofstream UFrequencyFile("UFrequency.txt");
+    std::ofstream VFrequencyFile("VFrequency.txt");
 
     for (int i = -255; i < 256; i++)
     {
