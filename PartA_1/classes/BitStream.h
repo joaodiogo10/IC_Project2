@@ -3,6 +3,10 @@
 #include <iostream>
 #include <fstream>
 
+/** \file 
+ *  BitStream class header file.
+*/
+
 /** 
  * \brief Class to read and write bits from a file. 
  * 
@@ -23,8 +27,8 @@ public:
 
     /**
          * \brief Construct a new BitStream object.
-         * \param file Path to the target file.
-         * \param mode
+         * \param[in] file Path to the target file.
+         * \param[in] mode
          * \sa BitStream::bs_mode. 
          */
     BitStream(const std::string file, BitStream::bs_mode mode);
@@ -45,7 +49,7 @@ public:
         * Ex:
         * 0000 0001 (bit 1).
         * 0000 0000 (bit 0).
-        * \param res Reference where the read value is written to.
+        * \param[in, out] res Reference where the read value is written to.
         * \return True, if no errors occurred.
         * \return False, if errors occurred.
         */
@@ -53,7 +57,7 @@ public:
 
     /**
         * \brief Write a bit to BitStream.
-        * \param bit Bit value to be written (bit is assumed to be in the LSB).
+        * \param[in] bit Bit value to be written (bit is assumed to be in the LSB).
         */
     bool writeBit(const unsigned char bit);
 
@@ -67,8 +71,8 @@ public:
         * Result: \n
         * \p bits[0] = 1010 0000 \n
         * \p bits[1] = 0000 1010 \n
-        * \param bit Unsigned char array containing read bits.
-        * \param nBits Number of bits to be read.
+        * \param[in, out] bit Unsigned char array containing read bits.
+        * \param[in] nBits Number of bits to be read.
         * \return True, if no errors occurred.
         * \return False, if errors occurred.
         */
@@ -79,8 +83,8 @@ public:
         * 
         * Writes \p nBits starting at the most significant bit.
         * 
-        * \param bit Array containing bits to be writen.
-        * \param nBits Number of bits to write.
+        * \param[in] bit Array containing bits to be writen.
+        * \param[in] nBits Number of bits to write.
         * \return True, if no errors occurred.
         * \return False, if errors occurred.
         */
@@ -88,18 +92,18 @@ public:
 
     /**
          * \brief Open BitStream to the file.
-         * \param filePath Path to the target file.
-         * \param mode
+         * \param[in] filePath Path to the target file.
+         * \param[in] mode
          * \sa BitStream::bs_mode.
          * \return True, if no errors occurred.
          * \return False, if errors occurred.
          */
-    bool open(std::string filePath, BitStream::bs_mode mode);
+    bool open(const std::string filePath, const BitStream::bs_mode mode);
 
     /**
          * @brief Flush all bits in stream buffer to the stream
          * 
-         * if \p bits & 0x01 == 0, 0's are introduced as padding to write an entire byte.
+         * if \p bit & 0x01 == 0, 0's are introduced as padding to write an entire byte.
          * Otherwise, 1's are introduced. 
          * 
          * Ex:\n
@@ -111,6 +115,7 @@ public:
          * Bits in buffer 101111. \n
          * Bits written 10111111.
          *  
+         * \param[in] bit binary value to introduce as padding
          * \return True, if no errors occurred.
          * \return False, if errors occurred.
          */

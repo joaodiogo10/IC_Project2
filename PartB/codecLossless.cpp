@@ -11,13 +11,24 @@
 //------------------------------------------------------------
 //-------------------Function prototypes----------------------
 //------------------------------------------------------------
+/**
+ * \brief Calculate residuals entropy and generate matlab files
+ * 
+ * Channels' residuals are passed has a vector of vectors containing the residuals values of each channel.\n
+ * The return vector containing the entropies result will match the order of residuals vector passed as argument.\n
+ *
+* Files are writting to matlab directory as channel1.txt and channel2.txt.\n
+ * \param[in] residuals Vector of vectors contains residuals of each channel
+ * \param[in] bitDepth bitDepth of the audio channel
+ * \return Vector of integers from the converted audio channel
+ */
 std::vector<double> calculateEntropyAndResidualHistograms(const std::vector<std::vector<int>> &residuals, const int bitDepth);
 
 /**
  * \brief Converts the amplitude of an audio channel form a vector of doubles to a vector of integers
  * 
- * \param channel Vector of doubles from the audio channel to convert
- * \param bitDepth bitDepth of the audio channel
+ * \param[in] channel Vector of doubles from the audio channel to convert
+ * \param[in] bitDepth bitDepth of the audio channel
  * \return Vector of integers from the converted audio channel
  */
 std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> channel, const int bitDepth);
@@ -25,8 +36,8 @@ std::vector<int> convertChannelAmplitudeToInteger(const std::vector<double> chan
 /**
  * \brief Converts the amplitude of an audio channel form a vector of integers to its original state
  * 
- * \param channel Vector of integers from the converted audio channel
- * \param bitDepth bitDepth of the audio channel
+ * \param[in] channel Vector of integers from the converted audio channel
+ * \param[in] bitDepth bitDepth of the audio channel
  * \return Vector of doubles from the original audio channel
  */
 std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channel, const int bitDepth);
@@ -34,58 +45,55 @@ std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channe
 /**
  * \brief Encodes file on a first order predictor basis
  * 
- * \param audioFile audioFile to encode
- * \param outputFilePath name of the encoded output file
+ * \param[in] audioFile audioFile to encode
+ * \param[in] outputFilePath name of the encoded output file
  * \return Vector of the residual values of the encoded file
- * \return Predictor encoded file of the audio file
  */
-std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
+std::vector<std::vector<int>> firstOrderPredictorEncoder(const AudioFile<double> audioFile, const std::string outputFilePath);
 
 /**
  * \brief Decodes file on a first order predictor basis
  * 
- * \param encodedFilePath path of the predictor encoded file
- * \param outputFilePath name of the decoded output file
+ * \param[in] encodedFilePath path of the predictor encoded file
+ * \param[in] outputFilePath name of the decoded output file
  * \return Decoded audio file
  */
-void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath);
+void firstOrderPredictorDecoder(const std::string encodedFilePath, const std::string outputFilePath);
 
 /**
  * \brief Encodes file on a polynomial predictor basis
  * 
- * \param audioFile audioFile to encode
- * \param outputFilePath name of the encoded output file
+ * \param[in] audioFile audioFile to encode
+ * \param[in] outputFilePath name of the encoded output file
  * \return Vector of the residual values of the encoded file
- * \return Polynomial encoded file of the audio file
  */
-std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
+std::vector<std::vector<int>> polynomialPredictorEncoder(const AudioFile<double> audioFile, const  std::string outputFilePath);
 
 /**
  * \brief Decodes file on a polynomial predictor basis
  * 
- * \param encodedFilePath path of the polynomial encoded file
- * \param outputFilePath name of the decoded output file
+ * \param[in] encodedFilePath path of the polynomial encoded file
+ * \param[in] outputFilePath name of the decoded output file
  * \return Decoded audio file
  */
-void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath);
+void polynomialDecoder(const std::string encodedFilePath, const std::string outputFilePath);
 
 /**
  * \brief Encodes file on a redundancy basis
- * \param audioFile audioFile to encode
- * \param outputFilePath name of the encoded output file
+ * \param[in] audioFile audioFile to encode
+ * \param[in] outputFilePath name of the encoded output file
  * \return Vector of the residual values of the encoded file
- * \return Redundancy encoded file of the audio file
  */
-std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath);
+std::vector<std::vector<int>> redundancyPredictorEncoder(const AudioFile<double> audioFile, const std::string outputFilePath);
 
 /**
  * \brief Decodes file on a redundancy basis
  * 
- * \param encodedFilePath path of the redundancy encoded file
- * \param outputFilePath name of the decoded output file
+ * \param[in] encodedFilePath path of the redundancy encoded file
+ * \param[in] outputFilePath name of the decoded output file
  * \return Decoded audio file
  */
-void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath);
+void redundancyDecoder(const std::string encodedFilePath, const std::string outputFilePath);
 
 //------------------------------------------------------------
 //-------------------Constants--------------------------------
@@ -114,9 +122,9 @@ const std::tuple<EncoderFunction,DecoderFunction> codecArray[] =
  * 
  * Usage: ./codecLossless <AudioFilePath> <CodecNumber> <OutputFile>
  * 
- * \param AudioFilePath input audio file
- * \param CodecNumber target codec number
- * \param OutputFile output file name for results
+ * \param[in] AudioFilePath input audio file
+ * \param[in] CodecNumber target codec number
+ * \param[in] OutputFile output file name for results
  */
 int main(int argc, char *argv[]){
     if (argc < 4 || std::atoi(argv[2]) > 2 || std::atoi(argv[2]) < 0) {
@@ -255,7 +263,7 @@ std::vector<double> revertChannelAmplitudeToDouble(const std::vector<int> channe
     return  doubleChannel;
 }
 
-std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath) {
+std::vector<std::vector<int>> redundancyPredictorEncoder(const AudioFile<double> audioFile, const std::string outputFilePath) {
     Golomb golomb(outputFilePath, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -310,7 +318,7 @@ std::vector<std::vector<int>> redundancyPredictorEncoder(AudioFile<double> audio
     return encodedResiduals;
 }
 
-void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) {
+void redundancyDecoder(const std::string encodedFilePath, const std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
     int32_t m1 = decoder.decodeNumber();
@@ -379,7 +387,7 @@ void redundancyDecoder(std::string encodedFilePath, std::string outputFilePath) 
     audioFile.save(outputFilePath + ".wav");
 }
 
-std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath) {
+std::vector<std::vector<int>> polynomialPredictorEncoder(const AudioFile<double> audioFile, const std::string outputFilePath) {
     Golomb golomb(outputFilePath, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -459,7 +467,7 @@ std::vector<std::vector<int>> polynomialPredictorEncoder(AudioFile<double> audio
     return encodedResiduals;
 }
 
-void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) {
+void polynomialDecoder(const std::string encodedFilePath, const std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
 
     int32_t m1 = decoder.decodeNumber();
@@ -548,7 +556,7 @@ void polynomialDecoder(std::string encodedFilePath, std::string outputFilePath) 
     audioFile.save(outputFilePath + ".wav");
 }
 
-std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audioFile, std::string outputFilePath) {
+std::vector<std::vector<int>> firstOrderPredictorEncoder(const AudioFile<double> audioFile, const std::string outputFilePath) {
     Golomb golomb(outputFilePath, BitStream::bs_mode::write, headerM);
 
     int numSamples = audioFile.getNumSamplesPerChannel();
@@ -593,7 +601,7 @@ std::vector<std::vector<int>> firstOrderPredictorEncoder(AudioFile<double> audio
     return encodedResiduals;
 } 
 
-void firstOrderPredictorDecoder(std::string encodedFilePath, std::string outputFilePath) {
+void firstOrderPredictorDecoder(const std::string encodedFilePath, const std::string outputFilePath) {
     Golomb decoder(encodedFilePath, BitStream::bs_mode::read, headerM);
     int32_t m1 = decoder.decodeNumber();
     int32_t m2 = decoder.decodeNumber();

@@ -303,7 +303,7 @@ const bool BitStream::validWriteOperation()
     return true;
 }
 
-bool BitStream::open(std::string file, BitStream::bs_mode mode)
+bool BitStream::open(const std::string file, const BitStream::bs_mode mode)
 {
     if (fOpen)
     {

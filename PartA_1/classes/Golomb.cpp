@@ -1,7 +1,7 @@
 #include "Golomb.h"
 #include "math.h"
 
-Golomb::Golomb(const std::string filePath, const BitStream::bs_mode mode, uint32_t m) : stream(filePath, mode){
+Golomb::Golomb(const std::string filePath, const BitStream::bs_mode mode, const uint32_t m) : stream(filePath, mode){
     if(m == 0) {
         printf("ERROR: m can't be 0");
         throw "M cannot be 0!";
@@ -9,7 +9,7 @@ Golomb::Golomb(const std::string filePath, const BitStream::bs_mode mode, uint32
     this->m = m;
 }
 
-void Golomb::setM(uint32_t m) {
+void Golomb::setM(const uint32_t m) {
     if(m == 0)
         printf("ERROR: m can't be 0");
     
@@ -139,7 +139,7 @@ bool Golomb::close() {
     return stream.close();   
 }
 
-bool Golomb::open(std::string filePath, BitStream::bs_mode mode) {
+bool Golomb::open(const std::string filePath, const BitStream::bs_mode mode) {
     return stream.open(filePath, mode);   
 }
 
@@ -147,7 +147,7 @@ bool Golomb::isOpen() {
     return stream.isOpen();   
 }
 
-uint Golomb::getOtimizedM(std::vector<int> values) {
+uint Golomb::getOtimizedM(const std::vector<int> values) {
     double sum = 0;
     for(int value : values) {
         sum += foldNumber(value);
