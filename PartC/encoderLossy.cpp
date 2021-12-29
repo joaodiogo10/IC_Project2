@@ -8,9 +8,9 @@ using namespace cv;
 
 /** \file 
  *  Lossy encoder. \n
- *  Image transformations are saved in files under imageResults/lossy/ImageName. \n
- *  Frequency of residuals are written in files under matlab/lossy/ImageName. \n
- *  File with the encoded information is written under compressedResults/lossy. \n
+ *  Image transformations are saved in files. \n
+ *  Frequency of residuals are written in files. \n
+ *  File with the encoded information is written. \n
 */
 
 /**
@@ -686,10 +686,10 @@ uint32_t getOptimalM(cv::Mat &YResiduals, cv::Mat &UReducedResiduals, cv::Mat &V
 
 void writeMatlabVectorFiles(map<int, double> &mapY, map<int, double> &mapU, map<int, double> &mapV)
 {
-    std::ofstream xAxisFile("../matlab/xAxis.txt");
-    std::ofstream YFrequencyFile("../matlab/YFrequency.txt");
-    std::ofstream UFrequencyFile("../matlab/UFrequency.txt");
-    std::ofstream VFrequencyFile("../matlab/VFrequency.txt");
+    std::ofstream xAxisFile("xAxis.txt");
+    std::ofstream YFrequencyFile("YFrequency.txt");
+    std::ofstream UFrequencyFile("UFrequency.txt");
+    std::ofstream VFrequencyFile("VFrequency.txt");
 
     for (int i = -255; i < 256; i++)
     {
